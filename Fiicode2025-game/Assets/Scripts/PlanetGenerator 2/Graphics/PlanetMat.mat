@@ -24,14 +24,24 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _GradientTex:
+        m_Texture: {fileID: 2800000, guid: 2fb5f8bb785f8e0479473b0f5dda8fc9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texture:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _MaxHeight: 1
-    - _MinHeight: -0.2
+    - _MaxHeight: 0.25
+    - _MinHeight: 0
     - _PlanetRadius: 2.72
-    m_Colors: []
+    - _WaterHeight: 0
+    - _WaveFrequency: 10
+    - _WaveScale: 1.5
+    - _WaveSpeed: 1
+    - _WaveStrength: 0.05
+    m_Colors:
+    - _elevationMinMax: {r: 0, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
