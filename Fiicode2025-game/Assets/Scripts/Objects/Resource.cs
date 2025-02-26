@@ -1,16 +1,9 @@
 using UnityEngine;
 
-public class Resource : MonoBehaviour
+public class Resource : Interactable
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public override void Interact()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        base.Interact();
     }
 }
