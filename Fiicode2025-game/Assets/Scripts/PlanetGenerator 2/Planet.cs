@@ -20,6 +20,7 @@ public class Planet : MonoBehaviour {
 
     ShapeGenerator shapeGenerator = new ShapeGenerator();
     ColourGenerator colourGenerator = new ColourGenerator();
+    [SerializeField] private Spawner spawner;
 
     [SerializeField, HideInInspector]
     MeshFilter[] meshFilters;
@@ -28,6 +29,7 @@ public class Planet : MonoBehaviour {
     void Start()
     {
         GeneratePlanet();
+        spawner.SpawnObjects(shapeGenerator);
     }
     
 	void Initialize()
