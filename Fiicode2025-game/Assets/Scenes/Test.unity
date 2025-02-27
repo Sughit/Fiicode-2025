@@ -223,6 +223,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scanningObj: {fileID: 0}
+  discovery: 
 --- !u!114 &212718816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -255,6 +256,7 @@ GameObject:
   - component: {fileID: 249328561}
   - component: {fileID: 249328566}
   - component: {fileID: 249328565}
+  - component: {fileID: 249328567}
   m_Layer: 0
   m_Name: Sphere (1)
   m_TagString: Untagged
@@ -397,6 +399,19 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &249328567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249328560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49f844ef85030fc4d94eea3bc0ec41c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventory: {fileID: 11400000, guid: 2166153e7bc912c489194a43117c2fb7, type: 2}
 --- !u!1 &293289911
 GameObject:
   m_ObjectHideFlags: 0
@@ -588,6 +603,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scanningObj: {fileID: 912051791}
+  discovery: plank
 --- !u!114 &877130715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1110,6 +1126,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scanningObj: {fileID: 182949951}
+  discovery: paper
 --- !u!114 &1664675092
 MonoBehaviour:
   m_ObjectHideFlags: 0
