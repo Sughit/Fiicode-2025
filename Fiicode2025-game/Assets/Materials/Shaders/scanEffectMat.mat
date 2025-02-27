@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Skybox
-  m_Shader: {fileID: 4800000, guid: 75ebfacd826b829488268d39691d1aee, type: 3}
+  m_Name: scanEffectMat
+  m_Shader: {fileID: 4800000, guid: 2dc59b52b64bca247b0feee1a0ffd469, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -23,17 +23,16 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _Cubemap1:
-        m_Texture: {fileID: 8900000, guid: d6a64d96999aec647a489f7d73c1a4c6, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Cubemap2:
-        m_Texture: {fileID: 8900000, guid: ac8a32e5107b67a47939926c52798a2b, type: 3}
+    - _MainTex:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Blend: 0.45542234
-    m_Colors: []
+    - _ScanBandWidth: 0.1
+    - _ScanBaseHeight: 2.4225407
+    - _ScanIntensity: 1
+    m_Colors:
+    - _ScanColor: {r: 0, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
