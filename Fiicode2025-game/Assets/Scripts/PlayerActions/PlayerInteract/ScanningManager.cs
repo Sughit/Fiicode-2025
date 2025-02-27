@@ -16,7 +16,6 @@ public class ScanningManager : MonoBehaviour
     private MeshFilter meshFilter;
     private Coroutine scanningCoroutine;
 
-    // These will be set when a scan is started.
     private Transform player;
     private Transform scannedObject;
 
@@ -32,43 +31,30 @@ public class ScanningManager : MonoBehaviour
 
     void Start()
     {
-        // Create the scanning triangle (only once).
         GameObject scanningPlane = new GameObject("ScanningPlane");
         scanningPlane.transform.parent = transform;
 
         meshFilter = scanningPlane.AddComponent<MeshFilter>();
         MeshRenderer renderer = scanningPlane.AddComponent<MeshRenderer>();
-        // Set the scanning color from the scanned object's material.
         renderer.material.SetColor("_BaseColor", scannedObjectMaterial.GetColor("_ScanColor"));
 
         scanningMesh = new Mesh();
         meshFilter.mesh = scanningMesh;
         
-        // Initially hide the scanning mesh.
         scanningPlane.SetActive(false);
     }
 
-    /// <summary>
-    /// Starts a scanning process for the given duration using the specified player and scanned object.
-    /// </summary>
-    /// <param name="player">The player transform.</param>
-    /// <param name="scannedObject">The transform of the object to scan.</param>
-    /// <param name="scanDuration">The duration (in seconds) to perform the scan.</param>
-    public void StartScan(Transform player, Transform scannedObject, float scanDuration = 15f)
+    public void StartScan(Transform player, Transform scannedObject, float scanDuration = 5f)
     {
-        // Save the references.
         this.player = player;
         this.scannedObject = scannedObject;
 
-        // Re-enable the scanned object in case it was disabled.
         if (!scannedObject.gameObject.activeSelf)
             scannedObject.gameObject.SetActive(true);
 
-        // Enable the scanning mesh so it's visible.
         if (meshFilter != null && meshFilter.gameObject != null)
         {
             meshFilter.gameObject.SetActive(true);
-            // Reapply the scanning color so the triangle displays it.
             MeshRenderer renderer = meshFilter.gameObject.GetComponent<MeshRenderer>();
             if (renderer != null)
             {
@@ -76,7 +62,6 @@ public class ScanningManager : MonoBehaviour
             }
         }
 
-        // If a scan is already running, stop it.
         if (scanningCoroutine != null)
         {
             StopCoroutine(scanningCoroutine);
@@ -89,14 +74,12 @@ public class ScanningManager : MonoBehaviour
         float elapsedTime = 0f;
         while (elapsedTime < scanDuration)
         {
-            // Cancel the scan if the player and object are too far apart.
             if (Vector3.Distance(player.position, scannedObject.position) > maxScanDistance)
             {
                 CancelScan();
                 yield break;
             }
 
-            // Update the scanning mesh each frame.
             UpdateScanningMesh();
 
             elapsedTime += Time.deltaTime;
@@ -176,10 +159,6 @@ public class ScanningManager : MonoBehaviour
         if (scannedObjectMaterial != null)
             scannedObjectMaterial.SetFloat("_ScanBaseHeight", baseY);
     }
-
-    /// <summary>
-    /// Cancels the scanning process if conditions are not met (e.g. too much distance).
-    /// </summary>
     public void CancelScan()
     {
         if (scanningCoroutine != null)
@@ -188,9 +167,7 @@ public class ScanningManager : MonoBehaviour
             scanningCoroutine = null;
         }
         Debug.Log("Scan cancelled: Player is too far from the scanned object.");
-        // Clear the scanning mesh.
         scanningMesh.Clear();
-        // Hide the scanning mesh and scanned object.
         if (meshFilter != null && meshFilter.gameObject != null)
         {
             meshFilter.gameObject.SetActive(false);
@@ -198,19 +175,17 @@ public class ScanningManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Called when the scanning process completes normally.
-    /// </summary>
     private void FinishScan()
     {
         scanningCoroutine = null;
         Debug.Log("Scan finished successfully.");
-        // Hide the scanning mesh and scanned object.
+        scannedObject.parent.gameObject.GetComponent<Interactable>().CompletedScanLogic();
         if (meshFilter != null && meshFilter.gameObject != null)
         {
             meshFilter.gameObject.SetActive(false);
             scannedObject.gameObject.SetActive(false);
         }
         // Insert any additional logic for when a scan completes here.
+
     }
 }

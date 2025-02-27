@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: scanMat
-  m_Shader: {fileID: 4800000, guid: 1899a92f3007c5b4e86dc88083dbbb3c, type: 3}
+  m_Name: scanEffectMat
+  m_Shader: {fileID: 4800000, guid: 2dc59b52b64bca247b0feee1a0ffd469, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -29,20 +29,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _GlowIntensity: 2
-    - _MaxScanHeight: 1
-    - _MinScanHeight: 0
     - _ScanBandWidth: 0.1
-    - _ScanBaseHeight: 1.0338398
-    - _ScanHeight: 5
+    - _ScanBaseHeight: 1.5593979
     - _ScanIntensity: 1
-    - _ScanLineWidth: 0.1
-    - _ScanProgress: 4.2412615
-    - _ScanSpeed: 5
-    - _ScanWidth: 1.5
     m_Colors:
-    - _ObjectPos: {r: 0, g: 0.5, b: 0, a: 1}
-    - _PlayerPos: {r: 3.82, g: 0.5, b: 0, a: 1}
     - _ScanColor: {r: 0.035848916, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
