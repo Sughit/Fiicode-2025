@@ -3,9 +3,7 @@ Shader "Custom/ScanningEffect"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        // Dynamic base height provided by ScanningManager.
         _ScanBaseHeight ("Scan Base Height", Float) = 1.0
-        // Thickness (in world units) of the scanning band.
         _ScanBandWidth ("Scan Band Width", Float) = 0.2
         _ScanColor ("Scan Color", Color) = (0,1,1,1)
         _ScanIntensity ("Scan Intensity", Range(0,1)) = 1.0
@@ -18,6 +16,8 @@ Shader "Custom/ScanningEffect"
         
         Pass
         {
+            Cull Off  // Dezactivează culling-ul pentru a reda ambele fețe.
+            
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -55,11 +55,13 @@ Shader "Custom/ScanningEffect"
             fixed4 frag (v2f i) : SV_Target
             {
                 fixed4 col = tex2D(_MainTex, i.uv);
-                // Compute how far the fragment's world Y is from _ScanBaseHeight.
+                // Calculăm distanța față de înălțimea de bază a scanării.
                 float diff = abs(i.worldPos.y - _ScanBaseHeight);
-                // Create a smooth mask: fragments very near the base (diff close to 0) get full scan colour.
+                // Masca de bandă, unde valorile apropiate de _ScanBaseHeight vor primi efectul complet.
                 float band = 1.0 - smoothstep(0.0, _ScanBandWidth, diff);
-                col = lerp(col, _ScanColor, band * _ScanIntensity);
+                // Adăugăm un efect de glow: culorile din bandă se adaugă la culoarea de bază.
+                fixed4 emission = _ScanColor * (band * _ScanIntensity);
+                col.rgb += emission.rgb;
                 return col;
             }
             ENDCG

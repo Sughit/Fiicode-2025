@@ -16,7 +16,7 @@ public class Ruin : Interactable
         Debug.Log($"Ruin scanned {gameObject.name}");
         gameObject.layer = LayerMask.NameToLayer("Default");
         GetComponent<Outline>().enabled = false;
-        if(discovery != null) PlayerScanInventory.instance.Unlock(discovery);
+        if(discovery != null && discovery != "") PlayerScanInventory.instance.Unlock(discovery);
         else Debug.Log("There is no discovery!");
     }
 }

@@ -89,76 +89,86 @@ public class ScanningManager : MonoBehaviour
     }
 
     private void UpdateScanningMesh()
+{
+    if (player == null || scannedObject == null)
+        return;
+
+    Renderer rend = scannedObject.GetComponent<Renderer>();
+    if (rend == null)
+        return;
+
+    // Calculăm valorile de bază din bounds-ul planetei.
+    Bounds bounds = rend.bounds;
+    Vector3 center = bounds.center;
+    float baseY = Mathf.Lerp(bounds.min.y, bounds.max.y, Mathf.Abs(Mathf.Sin(Time.time * scanSpeed)));
+
+    // Calculăm direcția pe planul XZ de la centrul planetei către jucător.
+    Vector3 centerXZ = new Vector3(center.x, 0, center.z);
+    Vector3 playerXZ = new Vector3(player.position.x, 0, player.position.z);
+    Vector3 dir = playerXZ - centerXZ;
+    if (dir.sqrMagnitude < 0.0001f)
+        dir = Vector3.forward;
+    else
+        dir.Normalize();
+
+    // Calculăm vectorul perpendicular în planul XZ.
+    Vector3 perp = new Vector3(-dir.z, 0, dir.x);
+
+    // Determinăm jumătatea lățimii bazei.
+    float computedHalfWidth = Mathf.Abs(bounds.extents.x * perp.x) + Mathf.Abs(bounds.extents.z * perp.z);
+    float halfWidth = Mathf.Max(computedHalfWidth, minBaseWidth * 0.5f);
+
+    // Punctele de bază ale triunghiului.
+    Vector3 baseCenter = new Vector3(center.x, baseY, center.z);
+    Vector3 leftBase = baseCenter + perp * halfWidth;
+    Vector3 rightBase = baseCenter - perp * halfWidth;
+    Vector3 apex = player.position;
+
+    // Creăm mesh-ul dublu fațat:
+    // Prima față: (apex, leftBase, rightBase)
+    // A doua față: (apex, rightBase, leftBase)
+    Vector3[] vertices = new Vector3[6]
     {
-        if (player == null || scannedObject == null)
-            return;
+        apex, leftBase, rightBase,    // fața frontală
+        apex, rightBase, leftBase       // fața din spate (winding invers)
+    };
 
-        Renderer rend = scannedObject.GetComponent<Renderer>();
-        if (rend == null)
-            return;
+    int[] triangles = new int[6]
+    {
+        0, 1, 2,
+        3, 4, 5
+    };
 
-        Bounds bounds = rend.bounds;
-        Vector3 center = bounds.center;
+    // Setăm coordonatele UV (duplicat pentru ambele fețe).
+    Vector2[] uvs = new Vector2[6]
+    {
+        new Vector2(0.5f, 0.0f), new Vector2(0.0f, 1.0f), new Vector2(1.0f, 1.0f),
+        new Vector2(0.5f, 0.0f), new Vector2(1.0f, 1.0f), new Vector2(0.0f, 1.0f)
+    };
 
-        // Compute a dynamic base height using a sine oscillation.
-        float baseY = Mathf.Lerp(bounds.min.y, bounds.max.y, Mathf.Abs(Mathf.Sin(Time.time * scanSpeed)));
+    // Calculăm normală dorită folosind poziția jucătorului, presupunând că acesta este orientat corect pe planetă.
+    Vector3 planetCenter = scannedObject.position;
+    Vector3 desiredNormal = (player.position - planetCenter).normalized;
+    Vector3[] normals = new Vector3[6]
+    {
+        desiredNormal, desiredNormal, desiredNormal,
+        desiredNormal, desiredNormal, desiredNormal
+    };
 
-        // Calculate the center on the XZ plane.
-        Vector3 centerXZ = new Vector3(center.x, 0, center.z);
-        Vector3 playerXZ = new Vector3(player.position.x, 0, player.position.z);
+    // Actualizăm mesh-ul.
+    scanningMesh.Clear();
+    scanningMesh.vertices = vertices;
+    scanningMesh.triangles = triangles;
+    scanningMesh.uv = uvs;
+    scanningMesh.normals = normals;
 
-        // Get the direction from the object to the player.
-        Vector3 dir = playerXZ - centerXZ;
-        if (dir.sqrMagnitude < 0.0001f)
-            dir = Vector3.forward;
-        else
-            dir.Normalize();
+    // Sincronizare cu shader-ul, dacă este necesar.
+    scanningMaterial.SetFloat("_ScanBaseHeight", baseY);
+    if (scannedObjectMaterial != null)
+        scannedObjectMaterial.SetFloat("_ScanBaseHeight", baseY);
+}
 
-        // Compute a perpendicular direction in the XZ plane.
-        Vector3 perp = new Vector3(-dir.z, 0, dir.x);
 
-        // Determine the half-width of the scan based on object bounds (or use a minimum value).
-        float computedHalfWidth = Mathf.Abs(bounds.extents.x * perp.x) + Mathf.Abs(bounds.extents.z * perp.z);
-        float halfWidth = Mathf.Max(computedHalfWidth, minBaseWidth * 0.5f);
-
-        // Calculate base vertices for the scanning triangle.
-        Vector3 baseCenter = new Vector3(center.x, baseY, center.z);
-        Vector3 leftBase = baseCenter + perp * halfWidth;
-        Vector3 rightBase = baseCenter - perp * halfWidth;
-        Vector3 apex = player.position;
-
-        // Build the triangle vertices.
-        Vector3[] vertices = new Vector3[] { apex, leftBase, rightBase };
-
-        // Ensure the triangle's normal points upward.
-        Vector3 normal = Vector3.Cross(vertices[1] - apex, vertices[2] - apex);
-        if (normal.y < 0)
-        {
-            Vector3 temp = vertices[1];
-            vertices[1] = vertices[2];
-            vertices[2] = temp;
-        }
-
-        int[] triangles = new int[] { 0, 1, 2 };
-
-        // Define UV coordinates.
-        Vector2[] uvs = new Vector2[3];
-        uvs[0] = new Vector2(0.5f, 0.0f); // Apex.
-        uvs[1] = new Vector2(0.0f, 1.0f); // Left base.
-        uvs[2] = new Vector2(1.0f, 1.0f); // Right base.
-
-        // Update the mesh.
-        scanningMesh.Clear();
-        scanningMesh.vertices = vertices;
-        scanningMesh.triangles = triangles;
-        scanningMesh.uv = uvs;
-        scanningMesh.RecalculateNormals();
-
-        // Sync the base height uniform on both materials.
-        scanningMaterial.SetFloat("_ScanBaseHeight", baseY);
-        if (scannedObjectMaterial != null)
-            scannedObjectMaterial.SetFloat("_ScanBaseHeight", baseY);
-    }
     public void CancelScan()
     {
         if (scanningCoroutine != null)
