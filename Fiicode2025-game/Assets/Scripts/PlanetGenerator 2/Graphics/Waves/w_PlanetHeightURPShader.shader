@@ -22,6 +22,7 @@ Shader "Custom/w_PlanetHeightURPShader"
             #pragma vertex vert
             #pragma fragment frag
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
             struct Attributes
             {
@@ -32,6 +33,7 @@ Shader "Custom/w_PlanetHeightURPShader"
             {
                 float4 positionHCS : SV_POSITION;
                 float3 worldPos : TEXCOORD0;
+                float3 normal : TEXCOORD1;
             };
 
             TEXTURE2D(_GradientTex);
@@ -74,20 +76,18 @@ Shader "Custom/w_PlanetHeightURPShader"
                 Varyings output;
 
                 float3 vertexPos = input.positionOS.xyz;
-
                 float vertexHeight = length(vertexPos) - _PlanetRadius;
-
                 float inWater = step(vertexHeight, _WaterHeight);
 
                 // Calculate smooth, natural-looking waves
                 float wave = noise(vertexPos * _WaveScale + _Time.y * _WaveSpeed) - 0.5;
                 wave *= _WaveStrength;
-
                 vertexPos += normalize(vertexPos) * wave * inWater;
 
                 VertexPositionInputs vertexInput = GetVertexPositionInputs(vertexPos);
                 output.positionHCS = vertexInput.positionCS;
                 output.worldPos = vertexInput.positionWS;
+                output.normal = normalize(vertexInput.positionWS); // Approximate normal
 
                 return output;
             }
@@ -96,8 +96,24 @@ Shader "Custom/w_PlanetHeightURPShader"
             {
                 float height = length(input.worldPos) - _PlanetRadius;
                 float t = saturate((height - _MinHeight) / (_MaxHeight - _MinHeight));
-                half4 col = SAMPLE_TEXTURE2D(_GradientTex, sampler_GradientTex, float2(t, 0));
-                return col;
+                half4 baseColor = SAMPLE_TEXTURE2D(_GradientTex, sampler_GradientTex, float2(t, 0));
+
+                // Get dynamic light from Unity's URP system (day/night cycle support)
+                Light mainLight = GetMainLight();
+                float3 lightDir = normalize(mainLight.direction);
+                float3 normal = normalize(input.normal);
+
+                // Lambertian shading (diffuse lighting)
+                float diff = saturate(dot(normal, lightDir));
+                
+                // Apply light color dynamically based on the current sun/moon cycle
+                half3 litColor = baseColor.rgb * (diff * mainLight.color.rgb + 0.1); // 0.1 keeps ambient details
+
+                // Add a soft ambient factor for realism (not completely black at night)
+                float ambientStrength = 0.15; // Adjust to prevent total darkness
+                litColor += baseColor.rgb * ambientStrength;
+
+                return half4(litColor, baseColor.a);
             }
             ENDHLSL
         }

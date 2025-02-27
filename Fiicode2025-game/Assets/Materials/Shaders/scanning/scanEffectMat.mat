@@ -30,7 +30,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _ScanBandWidth: 0.1
-    - _ScanBaseHeight: 1.5593979
+    - _ScanBaseHeight: 1.699723
     - _ScanIntensity: 1
     m_Colors:
     - _ScanColor: {r: 0.035848916, g: 1, b: 1, a: 1}

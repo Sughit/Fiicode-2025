@@ -3,28 +3,64 @@ using Cinemachine;
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] private CinemachineFreeLook cinemachineCamera; // Assign the FreeLook Camera in the Inspector
-    [SerializeField] private Transform player;  // Assign the player transform
-    [SerializeField] private Transform planet;  // Assign the planet transform
-    [SerializeField] private float gravityAlignmentSpeed = 5f;
+    [Header("Referințe")]
+    [Tooltip("Transformul jucătorului")]
+    public Transform player;
+    
+    [Tooltip("Cinemachine Virtual Camera")]
+    public CinemachineVirtualCamera virtualCamera;
+    
+    [Tooltip("Transformul centrului planetei")]
+    public Transform planetCenter;
+
+    [Header("Setări Cameră")]
+    [Tooltip("Poziția camerei relativ la jucător (în spațiul local al jucătorului)")]
+    public Vector3 offset = new Vector3(0, 2, -4);
+
+    // Obiectul care va fi urmărit de Cinemachine
+    private Transform cameraFollowTarget;
+
+    void Start()
+    {
+        if (player == null || virtualCamera == null || planetCenter == null)
+        {
+            Debug.LogError("Setează player-ul, vcam-ul și planetCenter-ul în Inspector!");
+            return;
+        }
+
+        // Creăm un obiect auxiliar pentru Follow
+        GameObject followTarget = new GameObject("CameraFollowTarget");
+        cameraFollowTarget = followTarget.transform;
+
+        // Poziționăm target-ul inițial relativ la jucător
+        cameraFollowTarget.position = player.position + player.TransformDirection(offset);
+
+        // Setăm câmpurile Follow și LookAt ale Cinemachine Virtual Camera
+        virtualCamera.Follow = cameraFollowTarget;
+        virtualCamera.LookAt = player;
+    }
 
     void LateUpdate()
     {
-        AlignCameraWithGravity();
-    }
+        if (player == null || cameraFollowTarget == null || planetCenter == null)
+            return;
 
-    void AlignCameraWithGravity()
-    {
-        if (player == null || planet == null || cinemachineCamera == null) return;
+        // Actualizează poziția target-ului camerei
+        Vector3 desiredPosition = player.position + player.TransformDirection(offset);
+        cameraFollowTarget.position = desiredPosition;
 
-        // Get player's up direction (gravity-aligned)
-        Vector3 playerUp = (player.position - planet.position).normalized;
+        // Calculează vectorul 'up' folosind poziția jucătorului față de centrul planetei
+        Vector3 planetUp = (player.position - planetCenter.position).normalized;
 
-        // Align Cinemachine camera up direction with planet gravity
-        cinemachineCamera.m_YAxis.Value = 0.5f;  // Keeps the camera centered vertically
-        cinemachineCamera.m_XAxis.m_MaxSpeed = 300f; // Adjust rotation speed
+        // Obținem direcția de vizionare a jucătorului și eliminăm componenta pe planetUp
+        Vector3 playerForward = player.forward;
+        Vector3 correctedForward = Vector3.ProjectOnPlane(playerForward, planetUp).normalized;
 
-        Quaternion gravityAlignment = Quaternion.FromToRotation(cinemachineCamera.transform.up, playerUp) * cinemachineCamera.transform.rotation;
-        cinemachineCamera.transform.rotation = Quaternion.Slerp(cinemachineCamera.transform.rotation, gravityAlignment, Time.deltaTime * gravityAlignmentSpeed);
+        // Dacă jucătorul privește aproape exact în direcția planetUp (sau opusul), evităm diviziunea zero
+        if (correctedForward.sqrMagnitude < 0.001f)
+            correctedForward = playerForward;
+
+        // Setăm rotația target-ului camerei folosind direcția corectată și vectorul up calculat
+        cameraFollowTarget.rotation = Quaternion.LookRotation(correctedForward, planetUp);
     }
 }
