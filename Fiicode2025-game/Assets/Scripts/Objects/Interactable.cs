@@ -21,7 +21,7 @@ public abstract class Interactable : MonoBehaviour
         outline.enabled = false;
     }
 
-    public virtual void Interact()
+    public virtual void Interact(Transform player)
     {
         
     }

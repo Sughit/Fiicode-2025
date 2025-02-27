@@ -2,23 +2,32 @@ Shader "Custom/ScanningEffectObject"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+        _MainTex ("Texture", 2D) = "white" {} 
+        // The dynamic base height provided by ScanningManager.
         _ScanBaseHeight ("Scan Base Height", Float) = 1.0
+        // Thickness (in world units) of the scanning band.
         _ScanBandWidth ("Scan Band Width", Float) = 0.2
+        // The matte scan color.
         _ScanColor ("Scan Color", Color) = (0,1,1,1)
+        // Controls how strongly the band appears.
         _ScanIntensity ("Scan Intensity", Range(0,1)) = 1.0
     }
     
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
-        LOD 200
+        Tags { "Queue"="Transparent" "RenderType"="Transparent" }
+        LOD 100
         
-        Pass 
+        // Enable standard alpha blending and disable ZWrite for proper transparency.
+        Blend SrcAlpha OneMinusSrcAlpha
+        ZWrite Off
+        
+        Pass
         {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma target 3.0
             #include "UnityCG.cginc"
             
             sampler2D _MainTex;
@@ -52,12 +61,15 @@ Shader "Custom/ScanningEffectObject"
             
             fixed4 frag(v2f i) : SV_Target
             {
-                fixed4 col = tex2D(_MainTex, i.uv);
-                
+                // We're ignoring the underlying texture here since we want full transparency outside the band.
+                // Compute the absolute difference between the fragment's world Y and the scan base.
                 float diff = abs(i.worldPos.y - _ScanBaseHeight);
+                // Create a smooth mask: fragments near _ScanBaseHeight (within _ScanBandWidth) get a high mask value.
                 float band = 1.0 - smoothstep(0.0, _ScanBandWidth, diff);
                 
-                col = lerp(col, _ScanColor, band * _ScanIntensity);
+                // Output the scan color with an alpha equal to band * intensity.
+                fixed4 col = _ScanColor;
+                col.a = band * _ScanIntensity;
                 return col;
             }
             ENDCG

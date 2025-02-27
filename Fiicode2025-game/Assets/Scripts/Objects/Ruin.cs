@@ -2,8 +2,10 @@ using UnityEngine;
 
 public class Ruin : Interactable
 {
-    public override void Interact()
+    [SerializeField] private GameObject scanningObj;
+    public override void Interact(Transform player)
     {
-        base.Interact();
+        scanningObj.SetActive(true);
+        ScanningManager.instance.StartScan(player, scanningObj.transform);
     }
 }

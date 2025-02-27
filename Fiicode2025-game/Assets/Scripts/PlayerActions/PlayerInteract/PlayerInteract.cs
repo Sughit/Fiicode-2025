@@ -62,7 +62,7 @@ public class PlayerInteract : MonoBehaviour
             Interactable interactable = interactables[0].GetComponent<Interactable>();
             if (interactable != null)
             {
-                interactable.Interact();
+                interactable.Interact(this.transform);
                 Debug.Log($"Interacted with {interactables[0].name}");
             }
         }
