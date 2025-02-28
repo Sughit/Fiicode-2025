@@ -7,6 +7,8 @@ public class ShapeSettings : ScriptableObject {
 
     public float planetRadius = 1;
     public NoiseLayer[] noiseLayers;
+    public Quaternion orientation = Quaternion.identity;
+
 
     [System.Serializable]
     public class NoiseLayer

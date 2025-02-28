@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Skybox
-  m_Shader: {fileID: 4800000, guid: 75ebfacd826b829488268d39691d1aee, type: 3}
+  m_Name: RandomPlanetMat
+  m_Shader: {fileID: 4800000, guid: 70cb5657ead638842bac555009abe254, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -23,17 +23,23 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _Cubemap1:
-        m_Texture: {fileID: 8900000, guid: d6a64d96999aec647a489f7d73c1a4c6, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Cubemap2:
-        m_Texture: {fileID: 8900000, guid: ac8a32e5107b67a47939926c52798a2b, type: 3}
+    - _GradientTex:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Blend: 0.3537935
-    m_Colors: []
+    - _FoamSpacing: 1
+    - _FoamStrength: 0.5
+    - _FoamThreshold: 0.05
+    - _MaxHeight: 1
+    - _MinHeight: -0.2
+    - _PlanetRadius: 5.420513
+    - _WaterHeight: 0
+    - _WaveScale: 2
+    - _WaveSpeed: 1
+    - _WaveStrength: 0.05
+    m_Colors:
+    - _FoamColor: {r: 0.27788055, g: 0.27788055, b: 0.27788055, a: 0.27788055}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

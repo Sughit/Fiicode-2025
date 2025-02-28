@@ -11,11 +11,15 @@ Shader "Custom/w_PlanetHeightURPShader"
         _WaveStrength ("Wave Strength", Float) = 0.05
         _WaveScale ("Wave Scale", Float) = 2.0
         _WaveSpeed ("Wave Speed", Float) = 1.0
+
+        _FoamThreshold ("Foam Threshold", Float) = 0.05
+        _FoamStrength ("Foam Strength", Float) = 0.5
+        _FoamColor ("Foam Color", Color) = (1, 1, 1, 1)
     }
 
     SubShader
     {
-        Tags { "RenderPipeline"="UniversalPipeline" "RenderType"="Opaque"}
+        Tags { "RenderPipeline"="UniversalPipeline" "RenderType"="Opaque" }
         Pass
         {
             HLSLPROGRAM
@@ -29,11 +33,13 @@ Shader "Custom/w_PlanetHeightURPShader"
                 float4 positionOS : POSITION;
             };
 
+            // Vom transmite înălțimea calculată în object space (fără valuri) către fragment shader.
             struct Varyings
             {
                 float4 positionHCS : SV_POSITION;
                 float3 worldPos : TEXCOORD0;
                 float3 normal : TEXCOORD1;
+                float height : TEXCOORD2;
             };
 
             TEXTURE2D(_GradientTex);
@@ -46,18 +52,22 @@ Shader "Custom/w_PlanetHeightURPShader"
             float _WaveStrength;
             float _WaveScale;
             float _WaveSpeed;
+            float _FoamThreshold;
+            float _FoamStrength;
+            float4 _FoamColor; // Noul câmp pentru culoarea spumei
 
-            // Simple pseudo-random noise
-            float rand(float3 n) { 
-                return frac(sin(dot(n, float3(12.9898, 78.233, 37.719)))*43758.5453);
+            // Funcție de zgomot pseudo-aleator
+            float rand(float3 n) 
+            { 
+                return frac(sin(dot(n, float3(12.9898,78.233,37.719))) * 43758.5453);
             }
 
-            // Simple smooth noise function
-            float noise(float3 p){
+            // Funcție de zgomot lin și neted
+            float noise(float3 p)
+            {
                 float3 ip = floor(p);
                 float3 fp = frac(p);
                 fp = fp * fp * (3.0 - 2.0 * fp);
-
                 float n = lerp(
                     lerp(
                         lerp(rand(ip), rand(ip + float3(1,0,0)), fp.x),
@@ -75,43 +85,49 @@ Shader "Custom/w_PlanetHeightURPShader"
             {
                 Varyings output;
 
-                float3 vertexPos = input.positionOS.xyz;
-                float vertexHeight = length(vertexPos) - _PlanetRadius;
-                float inWater = step(vertexHeight, _WaterHeight);
+                // Poziția originală în object space (fără aplicarea efectului de wave pentru deplasare)
+                float3 originalPos = input.positionOS.xyz;
+                // Calculăm înălțimea în object space: diferența dintre distanța de la centru și raza planetei.
+                float vertexHeight = length(originalPos) - _PlanetRadius;
 
-                // Calculate smooth, natural-looking waves
-                float wave = noise(vertexPos * _WaveScale + _Time.y * _WaveSpeed) - 0.5;
-                wave *= _WaveStrength;
-                vertexPos += normalize(vertexPos) * wave * inWater;
+                // Calculul efectului de wave pentru a anima spuma, fără să deplaseze geometriile
+                // (valoarea wave se folosește mai târziu în fragment shader).
+                float wave = noise(originalPos * _WaveScale + _Time.y * _WaveSpeed) - 0.5;
 
-                VertexPositionInputs vertexInput = GetVertexPositionInputs(vertexPos);
+                VertexPositionInputs vertexInput = GetVertexPositionInputs(originalPos);
                 output.positionHCS = vertexInput.positionCS;
                 output.worldPos = vertexInput.positionWS;
-                output.normal = normalize(vertexInput.positionWS); // Approximate normal
+                output.normal = normalize(vertexInput.positionWS);
+                output.height = vertexHeight;
 
                 return output;
             }
 
             half4 frag(Varyings input) : SV_Target
             {
-                float height = length(input.worldPos) - _PlanetRadius;
+                // Calculăm factorul pentru gradient pe baza înălțimii (constant în object space)
+                float height = input.height;
                 float t = saturate((height - _MinHeight) / (_MaxHeight - _MinHeight));
                 half4 baseColor = SAMPLE_TEXTURE2D(_GradientTex, sampler_GradientTex, float2(t, 0));
 
-                // Get dynamic light from Unity's URP system (day/night cycle support)
+                // Obținem lumina principală din URP
                 Light mainLight = GetMainLight();
                 float3 lightDir = normalize(mainLight.direction);
                 float3 normal = normalize(input.normal);
 
-                // Lambertian shading (diffuse lighting)
+                // Iluminare difuză simplă (Lambert)
                 float diff = saturate(dot(normal, lightDir));
-                
-                // Apply light color dynamically based on the current sun/moon cycle
-                half3 litColor = baseColor.rgb * (diff * mainLight.color.rgb + 0.1); // 0.1 keeps ambient details
-
-                // Add a soft ambient factor for realism (not completely black at night)
-                float ambientStrength = 0.15; // Adjust to prevent total darkness
+                half3 litColor = baseColor.rgb * (diff * mainLight.color.rgb + 0.1);
+                float ambientStrength = 0.15;
                 litColor += baseColor.rgb * ambientStrength;
+
+                // Aplicăm efectul de spumă: dacă înălțimea este în jurul nivelului apei, adăugăm spumă animată.
+                float foamMask = smoothstep(_FoamThreshold, 0.0, abs(height - _WaterHeight));
+                float foamNoise = noise(input.worldPos * _WaveScale + _Time.y * _WaveSpeed);
+
+                // Folosim culoarea setată în proprietatea _FoamColor în loc de (1.0, 1.0, 1.0).
+                // Intensitatea este controlată de foamMask și _FoamStrength.
+                litColor = lerp(litColor, _FoamColor.rgb, foamMask * _FoamStrength * foamNoise);
 
                 return half4(litColor, baseColor.a);
             }

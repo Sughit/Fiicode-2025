@@ -33,6 +33,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _FoamSpacing: 1
+    - _FoamStrength: 0.02
+    - _FoamThreshold: 0.05
     - _GrassDensity: 5
     - _GrassThreshold: 0.4
     - _GrassWindSpeed: 2
@@ -42,10 +45,11 @@ Material:
     - _PlanetRadius: 10
     - _WaterHeight: 0
     - _WaveFrequency: 10
-    - _WaveScale: 1.5
+    - _WaveScale: 3.95
     - _WaveSpeed: 1
     - _WaveStrength: 0.05
     m_Colors:
+    - _FoamColor: {r: 0, g: 1, b: 0.9274397, a: 1}
     - _elevationMinMax: {r: 10, g: 10.98904, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
