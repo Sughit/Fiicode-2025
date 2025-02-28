@@ -15,6 +15,9 @@ public class PlayerBuild : MonoBehaviour
     private Blueprint blueprint;
     private bool isBuildingMode = false;
 
+    // Expose the building mode state so other scripts can check it.
+    public static bool IsBuildingModeActive { get; private set; }
+
     void Start()
     {
         if (PlayerController.instance != null)
@@ -30,7 +33,7 @@ public class PlayerBuild : MonoBehaviour
 
         UpdateBlueprintPosition();
 
-        if(Input.GetMouseButtonDown(0) && currentBlueprint != null)
+        if (Input.GetMouseButtonDown(0) && currentBlueprint != null)
         {
             if (blueprint != null && blueprint.CanPlace)
             {
@@ -54,6 +57,7 @@ public class PlayerBuild : MonoBehaviour
     void EnterBuildingMode()
     {
         isBuildingMode = true;
+        IsBuildingModeActive = true; // Set static flag
         if (currentBlueprint == null)
         {
             Vector3 initialPos = player.position + player.forward * Mathf.Min(maxPlacementDistance, 5f);
@@ -70,6 +74,7 @@ public class PlayerBuild : MonoBehaviour
     void ExitBuildingMode()
     {
         isBuildingMode = false;
+        IsBuildingModeActive = false; // Clear static flag
         if (currentBlueprint != null)
         {
             Destroy(currentBlueprint);

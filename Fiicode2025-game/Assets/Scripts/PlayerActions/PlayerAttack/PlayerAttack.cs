@@ -30,6 +30,10 @@ public class PlayerAttack : MonoBehaviour
 
     void Update()
     {
+        // Do not allow attacking when in building mode.
+        if (PlayerBuild.IsBuildingModeActive)
+            return;
+
         // When the attack button is held, fire automatically if cooldown allows.
         if (attackAction != null && attackAction.IsPressed() && Time.time >= nextFireTime)
         {
@@ -57,7 +61,6 @@ public class PlayerAttack : MonoBehaviour
                 Rigidbody rb = projectile.GetComponent<Rigidbody>();
                 if (rb != null)
                 {
-                    // Use playerGfx.forward to shoot in the direction the player's visual is facing.
                     rb.linearVelocity = playerGfx.forward * projectileSpeed;
                 }
             }
