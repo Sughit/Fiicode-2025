@@ -26,7 +26,6 @@ public class PlayerMovementOnPlanet : MonoBehaviour
     void HandleMoveInput(Vector2 input)
     {
         moveInput = input;
-        Debug.Log(moveInput);
     }
 
     void Update()

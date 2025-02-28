@@ -4,13 +4,13 @@ using System.Collections;
 public class ScanningManager : MonoBehaviour
 {
     [Header("References")]
-    public Material scanningMaterial;       // Material for the scanning triangle.
-    public Material scannedObjectMaterial;  // Material for the scanned object band.
+    [SerializeField] private Material scanningMaterial;       // Material for the scanning triangle.
+    [SerializeField] private Material scannedObjectMaterial;  // Material for the scanned object band.
 
     [Header("Scan Settings")]
-    public float scanSpeed = 1.0f;            // Oscillation speed.
-    public float minBaseWidth = 1.0f;         // Minimum full width of the base.
-    public float maxScanDistance = 10.0f;     // Maximum allowed distance between player and object.
+    [SerializeField] private float scanSpeed = 1.0f;            // Oscillation speed.
+    [SerializeField] private float minBaseWidth = 1.0f;         // Minimum full width of the base.
+    [SerializeField] private float maxScanDistance = 10.0f;     // Maximum allowed distance between player and object.
 
     private Mesh scanningMesh;
     private MeshFilter meshFilter;

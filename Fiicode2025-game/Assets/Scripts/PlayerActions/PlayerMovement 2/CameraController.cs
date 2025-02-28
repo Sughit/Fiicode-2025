@@ -5,17 +5,17 @@ public class CameraController : MonoBehaviour
 {
     [Header("Referințe")]
     [Tooltip("Transformul jucătorului")]
-    public Transform player;
+    [SerializeField] private Transform player;
     
     [Tooltip("Cinemachine Virtual Camera")]
-    public CinemachineVirtualCamera virtualCamera;
+    [SerializeField] private CinemachineVirtualCamera virtualCamera;
     
     [Tooltip("Transformul centrului planetei")]
-    public Transform planetCenter;
+    [SerializeField] private Transform planetCenter;
 
     [Header("Setări Cameră")]
     [Tooltip("Poziția camerei relativ la jucător (în spațiul local al jucătorului)")]
-    public Vector3 offset = new Vector3(0, 2, -4);
+    [SerializeField] private Vector3 offset = new Vector3(0, 2, -4);
 
     // Obiectul care va fi urmărit de Cinemachine
     private Transform cameraFollowTarget;

@@ -4,13 +4,13 @@ public class Blueprint : MonoBehaviour
 {
     [Header("Placement Settings")]
     [Tooltip("Layer-ul cu obstacole care împiedică plasarea clădirii.")]
-    public LayerMask placementObstacles;
+    [SerializeField] private LayerMask placementObstacles;
     
     [Tooltip("Culoarea blueprint-ului când plasarea este validă.")]
-    public Color validColor = Color.green;
+    [SerializeField] private Color validColor = Color.green;
     
     [Tooltip("Culoarea blueprint-ului când plasarea nu este validă.")]
-    public Color invalidColor = Color.red;
+    [SerializeField] private Color invalidColor = Color.red;
 
     // Proprietate publică pentru a afla dacă plasarea este validă.
     public bool CanPlace { get; private set; } = true;

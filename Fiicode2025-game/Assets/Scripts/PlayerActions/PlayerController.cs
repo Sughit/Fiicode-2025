@@ -11,9 +11,10 @@ public class PlayerController : MonoBehaviour
     public event Action OnInteract;
     public event Action OnOpenResearchMenu;
     public event Action OnOpenBuildingMenu;
+    public event Action OnAttack;
 
     PlayerInput playerInput;
-    InputAction moveAction, interactAction, openResearchMenuAction, openBuildingMenuAction;
+    InputAction moveAction, interactAction, openResearchMenuAction, openBuildingMenuAction, attackAction;
 
     void Awake()
     {
@@ -26,12 +27,14 @@ public class PlayerController : MonoBehaviour
         interactAction = playerInput.actions.FindAction("Interact");
         openResearchMenuAction = playerInput.actions.FindAction("OpenResearchMenu");
         openBuildingMenuAction = playerInput.actions.FindAction("OpenBuildingMenu");
+        attackAction = playerInput.actions.FindAction("Attack");
 
         moveAction.performed += OnMovePerformed;
         moveAction.canceled += OnMoveCanceled;
         interactAction.performed += ctx => OnInteract?.Invoke();
         openResearchMenuAction.performed += ctx => OnOpenResearchMenu?.Invoke();
         openBuildingMenuAction.performed += ctx => OnOpenBuildingMenu?.Invoke();
+        attackAction.performed += ctx => OnAttack?.Invoke();
     }
 
     void OnMovePerformed(InputAction.CallbackContext context)
@@ -51,6 +54,7 @@ public class PlayerController : MonoBehaviour
         interactAction.Enable();
         openResearchMenuAction.Enable();
         openBuildingMenuAction.Enable();
+        attackAction.Enable();
     }
 
     void OnDisable()
@@ -59,5 +63,6 @@ public class PlayerController : MonoBehaviour
         interactAction.Disable();
         openResearchMenuAction.Disable();
         openBuildingMenuAction.Disable();
+        attackAction.Disable();
     }
 }

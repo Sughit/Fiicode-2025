@@ -5,11 +5,11 @@ public class PlayerBuild : MonoBehaviour
     [Header("Prefabs & References")]
     public GameObject buildingPrefab;
     public GameObject blueprintPrefab;
-    public Transform player;
+    [SerializeField] private Transform player;
 
     [Header("Settings")]
-    public float maxPlacementDistance = 10f;
-    public LayerMask terrainLayer;
+    [SerializeField] private float maxPlacementDistance = 10f;
+    [SerializeField] private LayerMask terrainLayer;
 
     private GameObject currentBlueprint;
     private Blueprint blueprint;
