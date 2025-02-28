@@ -83,8 +83,9 @@ GameObject:
   - component: {fileID: 6150409889039741952}
   - component: {fileID: 8303596884422906444}
   - component: {fileID: 4531232238291495710}
-  - component: {fileID: 571493372239932338}
   - component: {fileID: 2074428680001810488}
+  - component: {fileID: 4243831403569443731}
+  - component: {fileID: 571493372239932338}
   - component: {fileID: 6071913436988938859}
   - component: {fileID: 6930061698295503148}
   m_Layer: 9
@@ -159,26 +160,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &571493372239932338
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3890749674720090373}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 130f056abdd8a8341827cc41b1a8d76d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  planet: {fileID: 0}
-  gfx: {fileID: 5753305381272047447}
-  gravityStrength: 10
-  moveSpeed: 5
-  rotationSpeed: 10
-  planetLayer:
-    serializedVersion: 2
-    m_Bits: 64
 --- !u!114 &2074428680001810488
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -209,6 +190,38 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &4243831403569443731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3890749674720090373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d016aef46e8a0d94e8a36239b7020558, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &571493372239932338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3890749674720090373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 130f056abdd8a8341827cc41b1a8d76d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  planet: {fileID: 0}
+  gfx: {fileID: 5753305381272047447}
+  gravityStrength: 10
+  moveSpeed: 5
+  rotationSpeed: 10
+  planetLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!114 &6071913436988938859
 MonoBehaviour:
   m_ObjectHideFlags: 0
