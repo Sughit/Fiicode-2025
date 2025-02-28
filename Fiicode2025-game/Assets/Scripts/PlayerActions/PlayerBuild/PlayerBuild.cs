@@ -15,7 +15,7 @@ public class PlayerBuild : MonoBehaviour
     private Blueprint blueprint;
     private bool isBuildingMode = false;
 
-    void Awake()
+    void Start()
     {
         if (PlayerController.instance != null)
         {

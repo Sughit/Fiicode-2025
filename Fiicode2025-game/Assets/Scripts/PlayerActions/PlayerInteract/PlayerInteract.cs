@@ -11,7 +11,7 @@ public class PlayerInteract : MonoBehaviour
     [SerializeField] private float interactRange = 5f;
     [SerializeField] private LayerMask interactLayer;
 
-    void Awake()
+    void Start()
     {
         if (PlayerController.instance != null)
         {

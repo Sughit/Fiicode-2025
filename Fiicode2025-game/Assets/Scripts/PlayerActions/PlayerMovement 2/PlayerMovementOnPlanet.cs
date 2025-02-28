@@ -12,7 +12,7 @@ public class PlayerMovementOnPlanet : MonoBehaviour
     private Rigidbody rb;
     private Vector2 moveInput;
 
-    void Awake()
+    void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false; 
@@ -26,6 +26,7 @@ public class PlayerMovementOnPlanet : MonoBehaviour
     void HandleMoveInput(Vector2 input)
     {
         moveInput = input;
+        Debug.Log(moveInput);
     }
 
     void Update()

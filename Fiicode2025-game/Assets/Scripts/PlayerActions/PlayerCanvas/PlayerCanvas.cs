@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerCanvas : MonoBehaviour
 {
-    void Awake()
+    void Start()
     {
         if (PlayerController.instance != null)
         {
