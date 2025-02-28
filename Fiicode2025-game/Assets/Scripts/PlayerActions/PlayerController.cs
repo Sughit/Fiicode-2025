@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System;
+using Cinemachine;
 
 [RequireComponent(typeof(PlayerInput))]
 public class PlayerController : MonoBehaviour
@@ -16,11 +17,13 @@ public class PlayerController : MonoBehaviour
     PlayerInput playerInput;
     InputAction moveAction, interactAction, openResearchMenuAction, openBuildingMenuAction, attackAction;
 
+    public CinemachineVirtualCamera interactionCam;
+
     void Awake()
     {
-        if(instance == null) instance = this;
+        if (instance == null) instance = this;
         else Destroy(this);
-        
+
         playerInput = GetComponent<PlayerInput>();
 
         moveAction = playerInput.actions.FindAction("Move");
@@ -34,13 +37,25 @@ public class PlayerController : MonoBehaviour
         interactAction.performed += ctx => OnInteract?.Invoke();
         openResearchMenuAction.performed += ctx => OnOpenResearchMenu?.Invoke();
         openBuildingMenuAction.performed += ctx => OnOpenBuildingMenu?.Invoke();
-        attackAction.performed += ctx => OnAttack?.Invoke();
+        // Check interaction state before firing an attack.
+        attackAction.performed += ctx =>
+        {
+            if (interactionCam != null && !interactionCam.gameObject.activeSelf) OnAttack?.Invoke();
+        };
     }
 
     void OnMovePerformed(InputAction.CallbackContext context)
     {
         Vector2 input = context.ReadValue<Vector2>();
         OnMove?.Invoke(input);
+
+        // If the player is moving and the interaction camera is active, disable it.
+        if (input.sqrMagnitude > 0.01f && interactionCam != null && interactionCam.gameObject.activeSelf)
+        {
+            interactionCam.LookAt = null;
+            interactionCam.Follow = null;
+            interactionCam.gameObject.SetActive(false);
+        }
     }
 
     void OnMoveCanceled(InputAction.CallbackContext context)

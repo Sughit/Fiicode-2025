@@ -2,15 +2,9 @@ using UnityEngine;
 
 public class Storage : Building
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public override void Interact()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        //OBLIGATORIU
+        base.Interact();
     }
 }

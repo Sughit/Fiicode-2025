@@ -50,10 +50,13 @@ public class PlayerInteract : MonoBehaviour
         if (interactableCount > 0)
         {
             Interactable interactable = interactables[0].GetComponent<Interactable>();
-            if (interactable != null)
+            if (interactable != null && interactable.tag == "Ruin")
             {
                 interactable.Interact(transform);
-                Debug.Log($"Interacted with {interactables[0].name}");
+            }
+            else if(interactable != null)
+            {
+                interactable.Interact();
             }
         }
     }

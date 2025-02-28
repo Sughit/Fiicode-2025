@@ -31,7 +31,7 @@ public class PlayerAttack : MonoBehaviour
     void Update()
     {
         // Prevent attacking if in building mode or if a building was just placed.
-        if (PlayerBuild.IsBuildingModeActive || PlayerBuild.JustPlacedBuilding)
+        if (PlayerBuild.IsBuildingModeActive || PlayerBuild.JustPlacedBuilding || PlayerController.instance.interactionCam.gameObject.activeSelf)
             return;
 
         // When the attack button is held, fire automatically if cooldown allows.
