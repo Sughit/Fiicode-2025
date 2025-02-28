@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class PlayerBuild : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class PlayerBuild : MonoBehaviour
 
     // Expose the building mode state so other scripts can check it.
     public static bool IsBuildingModeActive { get; private set; }
+    // Flag to indicate a building was just placed.
+    public static bool JustPlacedBuilding { get; private set; } = false;
 
     void Start()
     {
@@ -33,6 +36,7 @@ public class PlayerBuild : MonoBehaviour
 
         UpdateBlueprintPosition();
 
+        // Confirm building placement on left-click.
         if (Input.GetMouseButtonDown(0) && currentBlueprint != null)
         {
             if (blueprint != null && blueprint.CanPlace)
@@ -103,6 +107,16 @@ public class PlayerBuild : MonoBehaviour
     void PlaceBuilding()
     {
         Instantiate(buildingPrefab, currentBlueprint.transform.position, currentBlueprint.transform.rotation);
+        // Set the flag so that PlayerAttack can ignore the input for a short duration.
+        JustPlacedBuilding = true;
+        StartCoroutine(ResetJustPlacedBuilding());
         ExitBuildingMode();
+    }
+
+    IEnumerator ResetJustPlacedBuilding()
+    {
+        // Wait a bit longer than just one frame (e.g., 0.2 seconds) before resetting.
+        yield return new WaitForSeconds(0.2f);
+        JustPlacedBuilding = false;
     }
 }
