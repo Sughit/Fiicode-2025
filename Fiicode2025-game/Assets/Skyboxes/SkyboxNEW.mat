@@ -36,7 +36,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _CubemapPosition: 0
-    - _CubemapTransition: 0.98964906
+    - _CubemapTransition: 0.8942715
     - _Cubemapp: 1
     - _EnableFog: 1
     - _EnableRotation: 1
