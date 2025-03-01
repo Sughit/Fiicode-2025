@@ -45,22 +45,21 @@ public class CameraController : MonoBehaviour
         if (player == null || cameraFollowTarget == null || planetCenter == null)
             return;
 
-        // Actualizează poziția target-ului camerei
+        // Poziția camerei
         Vector3 desiredPosition = player.position + player.TransformDirection(offset);
-        cameraFollowTarget.position = desiredPosition;
+        cameraFollowTarget.position = Vector3.Lerp(cameraFollowTarget.position, desiredPosition, 10f * Time.deltaTime);
 
-        // Calculează vectorul 'up' folosind poziția jucătorului față de centrul planetei
+        // planetUp
         Vector3 planetUp = (player.position - planetCenter.position).normalized;
 
-        // Obținem direcția de vizionare a jucătorului și eliminăm componenta pe planetUp
+        // Calculează forward
         Vector3 playerForward = player.forward;
         Vector3 correctedForward = Vector3.ProjectOnPlane(playerForward, planetUp).normalized;
-
-        // Dacă jucătorul privește aproape exact în direcția planetUp (sau opusul), evităm diviziunea zero
         if (correctedForward.sqrMagnitude < 0.001f)
             correctedForward = playerForward;
 
-        // Setăm rotația target-ului camerei folosind direcția corectată și vectorul up calculat
-        cameraFollowTarget.rotation = Quaternion.LookRotation(correctedForward, planetUp);
+        // Rotația
+        Quaternion desiredRotation = Quaternion.LookRotation(correctedForward, planetUp);
+        cameraFollowTarget.rotation = Quaternion.Slerp(cameraFollowTarget.rotation, desiredRotation, 10f * Time.deltaTime);
     }
 }

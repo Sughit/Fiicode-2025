@@ -215,6 +215,7 @@ GameObject:
   - component: {fileID: 6071913436988938859}
   - component: {fileID: 6930061698295503148}
   - component: {fileID: 8243010514537987513}
+  - component: {fileID: 4182991566029227710}
   m_Layer: 9
   m_Name: player
   m_TagString: Untagged
@@ -286,9 +287,9 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &2074428680001810488
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -347,11 +348,8 @@ MonoBehaviour:
   planet: {fileID: 0}
   gfx: {fileID: 5753305381272047447}
   gravityStrength: 10
-  moveSpeed: 5
+  moveSpeed: 3
   rotationSpeed: 10
-  planetLayer:
-    serializedVersion: 2
-    m_Bits: 64
 --- !u!114 &6071913436988938859
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -368,6 +366,7 @@ MonoBehaviour:
   interactLayer:
     serializedVersion: 2
     m_Bits: 128
+  checkInterval: 0.1
 --- !u!114 &6930061698295503148
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -405,8 +404,19 @@ MonoBehaviour:
   playerGfx: {fileID: 5753305381272047447}
   projectilePrefab: {fileID: 9125074977919592783, guid: e409fa66213a6694f95e5e2a789d7518, type: 3}
   projectileSpeed: 10
-  damage: 10
   fireRate: 0.3
+--- !u!114 &4182991566029227710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3890749674720090373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9785e4303afe17d4784e19d242d976e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4208856757509760139
 GameObject:
   m_ObjectHideFlags: 0

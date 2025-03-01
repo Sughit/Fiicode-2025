@@ -144,5 +144,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49c4fb05c692975468cc94b010f1591e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  infoMenu: {fileID: 0}
-  cameraFollowOffset: {x: -2, y: 5, z: -10}
+  buildingType: 2
+  buildingName: Green House

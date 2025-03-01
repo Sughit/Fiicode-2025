@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     public static PlayerController instance;
 
     public event Action<Vector2> OnMove;
-    public event Action OnInteract;
+    public event Action OnInteract, OnCancelInteract;
     public event Action OnOpenResearchMenu;
     public event Action OnOpenBuildingMenu;
     public event Action OnAttack;
@@ -52,9 +52,7 @@ public class PlayerController : MonoBehaviour
         // If the player is moving and the interaction camera is active, disable it.
         if (input.sqrMagnitude > 0.01f && interactionCam != null && interactionCam.gameObject.activeSelf)
         {
-            interactionCam.LookAt = null;
-            interactionCam.Follow = null;
-            interactionCam.gameObject.SetActive(false);
+            OnCancelInteract?.Invoke();
         }
     }
 

@@ -3,50 +3,45 @@ using Cinemachine;
 
 public class Building : Interactable
 {
-    [SerializeField] private GameObject infoMenu;
+    [Header("Building Info")]
+    [SerializeField] private BuildingType buildingType;
+    [SerializeField] private string buildingName = "Default Building Name";
+
     private CinemachineVirtualCamera interactionCamera;
+
+    void Start()
+    {
+        if (PlayerController.instance != null)
+        {
+            PlayerController.instance.OnCancelInteract += EndInteraction;
+        }
+    }
 
     public override void Interact()
     {
+        // Activează camera de interacțiune (dacă vrei să focalizezi pe clădire).
         interactionCamera = PlayerController.instance.interactionCam;
         if (interactionCamera != null)
         {
-            // Set the camera to focus on this building.
             interactionCamera.LookAt = transform;
             interactionCamera.Follow = transform;
-            
-            // Activate the interaction camera.
             interactionCamera.gameObject.SetActive(true);
         }
-        
-        // Activate the info panel (assumed to be positioned on the right side of the screen).
-        if (infoMenu != null)
-        {
-            infoMenu.SetActive(true);
-        }
+
+        // Apelează CanvasManager pentru a deschide meniul corespunzător acestei clădiri
+        CanvasManager.instance.OpenBuildingUI(buildingType, buildingName);
     }
-    
-    // Call this method to end the interaction and revert to the main player camera.
-    public void EndInteraction(Transform playerCameraTarget)
+
+    public void EndInteraction()
     {
         if (interactionCamera != null)
         {
-            // Deactivate the interaction camera.
             interactionCamera.gameObject.SetActive(false);
-            // Optionally clear the LookAt and Follow targets.
             interactionCamera.LookAt = null;
             interactionCamera.Follow = null;
         }
-        
-        if (infoMenu != null)
-        {
-            infoMenu.SetActive(false);
-        }
-        
-        // Optionally, you can reassign the main player camera here if needed.
-        // For example:
-        // CinemachineVirtualCamera mainVCam = ...;
-        // mainVCam.LookAt = playerCameraTarget;
-        // mainVCam.Follow = playerCameraTarget;
+
+        // Închide meniul clădirii curente
+        CanvasManager.instance.CloseBuildingUI();
     }
 }

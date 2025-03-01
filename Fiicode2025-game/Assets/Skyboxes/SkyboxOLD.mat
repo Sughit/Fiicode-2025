@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Skybox
+  m_Name: SkyboxOLD
   m_Shader: {fileID: 4800000, guid: 75ebfacd826b829488268d39691d1aee, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -33,7 +33,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Blend: 0.3537935
+    - _Blend: 0.7723113
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1

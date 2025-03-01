@@ -7,16 +7,24 @@ public class PlayerMovementOnPlanet : MonoBehaviour
     [SerializeField] private float gravityStrength = 10f;
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotationSpeed = 10f;
-    [SerializeField] private LayerMask planetLayer;
 
     private Rigidbody rb;
     private Vector2 moveInput;
+    
+    // Salvăm direcția de mișcare aici, pentru rotația din LateUpdate
+    private Vector3 latestMoveDirection;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        rb.useGravity = false;
+        // Asigură-te că, în Inspector, ai:
+        // - Rb.interpolation = Interpolate
+        // - Collision detection = Continuous (dacă ai suprafețe neregulate)
+    }
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        rb.useGravity = false; 
-
         if (PlayerController.instance != null)
         {
             PlayerController.instance.OnMove += HandleMoveInput;
@@ -28,30 +36,50 @@ public class PlayerMovementOnPlanet : MonoBehaviour
         moveInput = input;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         ApplyGravity();
         HandleMovement();
     }
 
-    void ApplyGravity()
+    private void ApplyGravity()
     {
         Vector3 gravityDirection = (planet.position - transform.position).normalized;
         rb.AddForce(gravityDirection * gravityStrength, ForceMode.Acceleration);
 
+        // Rotește corpul jucătorului spre planetă
         Quaternion targetRotation = Quaternion.FromToRotation(transform.up, -gravityDirection) * transform.rotation;
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
     }
 
-    void HandleMovement()
+    private void HandleMovement()
     {
         if (moveInput != Vector2.zero)
         {
+            // Calculăm direcția de deplasare
             Vector3 moveDirection = (transform.right * moveInput.x + transform.forward * moveInput.y).normalized;
-            Vector3 targetPosition = rb.position + moveDirection * moveSpeed * Time.deltaTime;
-            rb.MovePosition(Vector3.Lerp(rb.position, targetPosition, 0.5f));
+            Vector3 targetPosition = rb.position + moveDirection * moveSpeed * Time.fixedDeltaTime;
 
-            Quaternion moveRotation = Quaternion.LookRotation(moveDirection, transform.up);
+            // Mișcăm rigidbody-ul
+            rb.MovePosition(targetPosition);
+
+            // Salvezi direcția pentru rotația ulterioară
+            latestMoveDirection = moveDirection;
+        }
+        else
+        {
+            // Dacă player-ul nu se mișcă, nu vrem să "aruncăm" un moveDirection vechi
+            latestMoveDirection = Vector3.zero;
+        }
+    }
+
+    // În LateUpdate, facem rotația graficii la fiecare frame
+    void LateUpdate()
+    {
+        // Dacă nu ai moveDirection, nu roti gfx
+        if (latestMoveDirection != Vector3.zero)
+        {
+            Quaternion moveRotation = Quaternion.LookRotation(latestMoveDirection, transform.up);
             gfx.rotation = Quaternion.Slerp(gfx.rotation, moveRotation, Time.deltaTime * rotationSpeed);
         }
     }

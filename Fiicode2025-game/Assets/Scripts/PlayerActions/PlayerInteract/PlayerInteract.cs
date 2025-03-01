@@ -3,13 +3,16 @@ using System.Collections.Generic;
 
 public class PlayerInteract : MonoBehaviour
 {
-    private Collider[] interactables = new Collider[10];
+    private Collider[] interactablesBuffer = new Collider[20];
     private HashSet<Interactable> previousInteractables = new HashSet<Interactable>();
     private HashSet<Interactable> currentInteractables = new HashSet<Interactable>();
     private int interactableCount = 0;
 
     [SerializeField] private float interactRange = 5f;
     [SerializeField] private LayerMask interactLayer;
+
+    [SerializeField] private float checkInterval = 0.1f;
+    private float nextCheckTime;
 
     void Start()
     {
@@ -21,42 +24,67 @@ public class PlayerInteract : MonoBehaviour
 
     void Update()
     {
-        HashSet<Interactable> temp = previousInteractables;
+        if (Time.time >= nextCheckTime)
+        {
+            nextCheckTime = Time.time + checkInterval;
+            RefreshInteractables();
+        }
+    }
+
+    void RefreshInteractables()
+    {
+        // Pregătim seturile
+        var temp = previousInteractables;
         previousInteractables = currentInteractables;
         currentInteractables = temp;
         currentInteractables.Clear();
 
-        interactableCount = Physics.OverlapSphereNonAlloc(transform.position, interactRange, interactables, interactLayer);
+        // Căutăm obiectele din jur
+        interactableCount = Physics.OverlapSphereNonAlloc(
+            transform.position,
+            interactRange,
+            interactablesBuffer,
+            interactLayer
+        );
 
-        for (int i = 0; i < interactableCount; i++)
+        Interactable firstInteractable = null;
+        if (interactableCount > 0)
         {
-            Interactable interactable = interactables[i].GetComponent<Interactable>();
-            if (interactable != null)
-            {
-                interactable.CanInteract();
-                currentInteractables.Add(interactable);
-            }
+            firstInteractable = interactablesBuffer[0].GetComponent<Interactable>();
         }
 
-        foreach (Interactable interactable in previousInteractables)
+        // Activează doar primul interactiv dacă există
+        if (firstInteractable != null)
         {
-            if (!currentInteractables.Contains(interactable))
-                interactable.CantInteract();
+            firstInteractable.CanInteract();
+            currentInteractables.Add(firstInteractable);
+        }
+
+        // Orice alt obiect care fusese "interactabil" înainte,
+        // dar nu e primul acum, devine neinteractabil
+        foreach (Interactable prev in previousInteractables)
+        {
+            if (prev != firstInteractable)
+                prev.CantInteract();
         }
     }
 
     void Interact()
     {
+        // Interactăm doar cu primul obiect din buffer (dacă există)
         if (interactableCount > 0)
         {
-            Interactable interactable = interactables[0].GetComponent<Interactable>();
-            if (interactable != null && interactable.tag == "Ruin")
+            Interactable interactable = interactablesBuffer[0].GetComponent<Interactable>();
+            if (interactable != null)
             {
-                interactable.Interact(transform);
-            }
-            else if(interactable != null)
-            {
-                interactable.Interact();
+                if (interactable.CompareTag("Ruin"))
+                {
+                    interactable.Interact(transform);
+                }
+                else
+                {
+                    interactable.Interact();
+                }
             }
         }
     }

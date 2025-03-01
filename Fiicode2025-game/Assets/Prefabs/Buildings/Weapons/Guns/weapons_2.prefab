@@ -12,12 +12,12 @@ GameObject:
   - component: {fileID: 1194465734631680684}
   - component: {fileID: 2921840037693299513}
   - component: {fileID: 725211221210343556}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: weapons_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &7616163031677658340
 Transform:
@@ -124,7 +124,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &8126746747784477935
 Transform:
