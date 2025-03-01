@@ -16,7 +16,7 @@ public class Blueprint : MonoBehaviour
     [SerializeField] private Color[] allowedColors;
 
     [Tooltip("Toleranța pentru compararea culorilor (doar r, g, b).")]
-    [SerializeField] private float colorThreshold = 0.1f;
+    [SerializeField] private float colorThreshold = 0.3f;
 
     // Proprietate publică pentru a afla dacă plasarea este validă.
     public bool CanPlace { get; private set; } = true;

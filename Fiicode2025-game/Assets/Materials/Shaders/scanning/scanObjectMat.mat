@@ -33,7 +33,7 @@ Material:
     - _MaxScanHeight: 1
     - _MinScanHeight: 0
     - _ScanBandWidth: 0.1
-    - _ScanBaseHeight: 7.4966435
+    - _ScanBaseHeight: 8.232779
     - _ScanHeight: 5
     - _ScanIntensity: 1
     - _ScanLineWidth: 0.1
