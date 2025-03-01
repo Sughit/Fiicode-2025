@@ -101,10 +101,15 @@ public class PlayerScanInventory : MonoBehaviour
     /// </summary>
     public void ResetInventory()
     {
-        inventory.ironIngot = false;
-        inventory.goldIngot = false;
-        inventory.plank = false;
-        inventory.paper = false;
+        inventory.iron = false;
+        inventory.gold = false;
+        inventory.coal = false;
+        inventory.wood = false;
+        inventory.stone = false;
+        inventory.water = false;
+        inventory.petrolium = false;
+        inventory.clay = false;
+        inventory.copper = false;
         SaveInventory(); // Save the reset values to avoid re-resetting
     }
 }

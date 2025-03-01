@@ -216,6 +216,8 @@ GameObject:
   - component: {fileID: 6930061698295503148}
   - component: {fileID: 8243010514537987513}
   - component: {fileID: 4182991566029227710}
+  - component: {fileID: 4807741702121260758}
+  - component: {fileID: 2288059668094903849}
   m_Layer: 9
   m_Name: player
   m_TagString: Untagged
@@ -379,8 +381,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5921cc4a47cebdc429d55ebaabd6d7af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buildingPrefab: {fileID: 8351950583972292358, guid: e17e8b598d5a67a4c8475f65a19d0412, type: 3}
-  blueprintPrefab: {fileID: 6433007529609764844, guid: a5adb26eb7703fc41ada7d55793cc54c, type: 3}
+  buildingPrefab: {fileID: 4850526272236376110, guid: 60abb0e803e345b4383fdbb58eeda217, type: 3}
+  blueprintPrefab: {fileID: 4114624516443404887, guid: b8f4fb98b46a24242a8b7939a65c5267, type: 3}
   player: {fileID: 6150409889039741952}
   maxPlacementDistance: 5
   terrainLayer:
@@ -417,6 +419,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9785e4303afe17d4784e19d242d976e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4807741702121260758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3890749674720090373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8632a38e835a4944a2cf63c249b3dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventory: {fileID: 11400000, guid: 918f2a245eced1f40a533d3f17afb918, type: 2}
+--- !u!114 &2288059668094903849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3890749674720090373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49f844ef85030fc4d94eea3bc0ec41c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventory: {fileID: 11400000, guid: 2166153e7bc912c489194a43117c2fb7, type: 2}
 --- !u!1 &4208856757509760139
 GameObject:
   m_ObjectHideFlags: 0

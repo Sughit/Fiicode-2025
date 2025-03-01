@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Planet
   - Ruin
+  - Resource
   layers:
   - Default
   - TransparentFX

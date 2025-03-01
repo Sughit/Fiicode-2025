@@ -3,8 +3,13 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Scan Inventory", menuName = "Custom/Scan Inventory")]
 public class ScanInventory : ScriptableObject
 {
-    public bool ironIngot;
-    public bool goldIngot;
-    public bool plank;
-    public bool paper;
+    public bool iron;
+    public bool gold;
+    public bool coal;
+    public bool wood;
+    public bool stone;
+    public bool water;
+    public bool petrolium;
+    public bool clay;
+    public bool copper;
 }
