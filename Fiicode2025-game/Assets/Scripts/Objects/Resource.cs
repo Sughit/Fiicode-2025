@@ -6,8 +6,9 @@ public class Resource : Interactable
     [Tooltip("Dacă este true, resursa va fi distrusă după minare.")]
     public bool destroyOnMine = false;
     
-    [Tooltip("Numele resursei, care trebuie să corespundă cu numele câmpului din ScanInventory (ex: \"ironIngot\").")]
+    [Tooltip("Numele resursei, care trebuie să corespundă cu numele câmpului din ScanInventory (ex: \"iron\").")]
     [SerializeField] private string resourceName;
+    [SerializeField] private string resourceAmount;
     [SerializeField] private GameObject scanningObj;
 
     /// <summary>
