@@ -232,4 +232,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destroyOnMine: 1
   resourceName: wood
+  resourceAmount: 60
   scanningObj: {fileID: 2531471648400458930}

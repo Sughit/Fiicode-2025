@@ -1469,6 +1469,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 249799e4a1f57234ca9f9c1ef12d354e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  planetType: 0
+  planetSize: 0
   resolution: 256
   autoUpdate: 1
   faceRenderMask: 0
@@ -1481,6 +1483,8 @@ MonoBehaviour:
   minNoiseLayers: 2
   maxNoiseLayers: 5
   userFoamColor: {r: 1, g: 1, b: 1, a: 1}
+  addMountainsAndSnowPeaks: 1
+  mountainStrengthMultiplier: 1.5
   meshFilters: []
 --- !u!1 &2140450108
 GameObject:

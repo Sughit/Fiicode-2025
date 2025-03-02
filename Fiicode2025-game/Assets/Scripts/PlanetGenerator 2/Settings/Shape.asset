@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddef467f1def77842abe511b0e5b8dde, type: 3}
   m_Name: Shape
   m_EditorClassIdentifier: 
-  planetRadius: 10
+  planetRadius: 20
   noiseLayers:
   - enabled: 1
     useFirstLayerAsMask: 0
@@ -56,3 +56,4 @@ MonoBehaviour:
         centre: {x: 0, y: 0, z: 0}
         minValue: 0.37
         weightMultiplier: 0.78
+  orientation: {x: 0, y: 0, z: 0, w: 1}

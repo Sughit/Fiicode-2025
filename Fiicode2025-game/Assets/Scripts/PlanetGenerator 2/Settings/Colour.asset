@@ -23,11 +23,11 @@ MonoBehaviour:
     key6: {r: 1, g: 1, b: 1, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 0
-    ctime1: 7170
-    ctime2: 15806
-    ctime3: 22128
-    ctime4: 48033
-    ctime5: 57285
+    ctime1: 6554
+    ctime2: 16384
+    ctime3: 22937
+    ctime4: 49151
+    ctime5: 55705
     ctime6: 65535
     ctime7: 0
     atime0: 0

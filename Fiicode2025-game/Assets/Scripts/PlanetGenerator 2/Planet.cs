@@ -29,10 +29,13 @@ public class Planet : MonoBehaviour {
     void Start()
     {
         GeneratePlanet();
-        spawner.SpawnObjects(shapeGenerator);
+        if(spawner != null)
+        {
+            spawner.SpawnObjects(shapeGenerator);
+        }
     }
     
-	void Initialize()
+    void Initialize()
     {
         shapeGenerator.UpdateSettings(shapeSettings);
         colourGenerator.UpdateSettings(colourSettings);
@@ -95,10 +98,22 @@ public class Planet : MonoBehaviour {
         {
             if (meshFilters[i].gameObject.activeSelf)
             {
+                // Construcția fiecărei fețe
                 terrainFaces[i].ConstructMesh();
+
+                // Asigurăm existența unui MeshCollider pe obiectul curent
+                MeshCollider meshCollider = meshFilters[i].GetComponent<MeshCollider>();
+                if (meshCollider == null)
+                {
+                    meshCollider = meshFilters[i].gameObject.AddComponent<MeshCollider>();
+                }
+
+                // Setăm mesh-ul nou generat și pe collider
+                meshCollider.sharedMesh = meshFilters[i].sharedMesh;
             }
         }
 
+        // Actualizare range pentru culori (de ex. pentru curbele de elevație)
         colourGenerator.UpdateElevation(shapeGenerator.elevationMinMax);
     }
 

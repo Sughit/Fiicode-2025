@@ -145,6 +145,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destroyOnMine: 1
   resourceName: wood
+  resourceAmount: 60
   scanningObj: {fileID: 8403218196341715633}
 --- !u!1 &8403218196341715633
 GameObject:

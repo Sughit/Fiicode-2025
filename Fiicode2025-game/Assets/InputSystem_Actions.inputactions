@@ -112,6 +112,15 @@
                     "processors": "",
                     "interactions": "Press",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "TogglePlanetSpace",
+                    "type": "Button",
+                    "id": "d3bb301b-f4f7-4420-8d6c-d2e2361b9d71",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Press",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -585,6 +594,17 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "OpenBuildingMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f83b0a71-3716-4088-94f1-7561181b30e4",
+                    "path": "<Keyboard>/z",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TogglePlanetSpace",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

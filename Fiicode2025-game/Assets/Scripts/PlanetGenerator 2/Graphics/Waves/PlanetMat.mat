@@ -42,7 +42,7 @@ Material:
     - _GrassWindStrength: 0.4
     - _MaxHeight: 0.4
     - _MinHeight: 0
-    - _PlanetRadius: 10
+    - _PlanetRadius: 20
     - _WaterHeight: 0
     - _WaveFrequency: 10
     - _WaveScale: 3.95
@@ -50,6 +50,6 @@ Material:
     - _WaveStrength: 0.05
     m_Colors:
     - _FoamColor: {r: 0, g: 1, b: 0.9274397, a: 1}
-    - _elevationMinMax: {r: 10, g: 10.98904, b: 0, a: 0}
+    - _elevationMinMax: {r: 20, g: 21.97808, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

@@ -13,9 +13,10 @@ public class PlayerController : MonoBehaviour
     public event Action OnOpenResearchMenu;
     public event Action OnOpenBuildingMenu;
     public event Action OnAttack;
+    public event Action OnTogglePlanetSpace;
 
     PlayerInput playerInput;
-    InputAction moveAction, interactAction, openResearchMenuAction, openBuildingMenuAction, attackAction;
+    InputAction moveAction, interactAction, openResearchMenuAction, openBuildingMenuAction, attackAction, togglePlanetSpaceAction;
 
     public CinemachineVirtualCamera interactionCam;
 
@@ -31,6 +32,7 @@ public class PlayerController : MonoBehaviour
         openResearchMenuAction = playerInput.actions.FindAction("OpenResearchMenu");
         openBuildingMenuAction = playerInput.actions.FindAction("OpenBuildingMenu");
         attackAction = playerInput.actions.FindAction("Attack");
+        togglePlanetSpaceAction = playerInput.actions.FindAction("TogglePlanetSpace");
 
         moveAction.performed += OnMovePerformed;
         moveAction.canceled += OnMoveCanceled;
@@ -42,6 +44,7 @@ public class PlayerController : MonoBehaviour
         {
             if (interactionCam != null && !interactionCam.gameObject.activeSelf) OnAttack?.Invoke();
         };
+        togglePlanetSpaceAction.performed += ctx => OnTogglePlanetSpace?.Invoke();
     }
 
     void OnMovePerformed(InputAction.CallbackContext context)

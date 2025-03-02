@@ -28,7 +28,8 @@ public class MiningManager : MonoBehaviour
 
     private void Awake()
     {
-        instance = this;
+        if(instance == null) instance = this;
+        else Destroy(this);
     }
 
     /// <summary>
@@ -38,6 +39,32 @@ public class MiningManager : MonoBehaviour
     /// <param name="player">Transformul jucătorului.</param>
     public void MineResource(Resource resource, Transform player)
     {
+        StartCoroutine(MineLoop(resource, player));
+    }
+
+    private IEnumerator MineLoop(Resource resource, Transform player)
+    {
+        while (true) // Buclă infinită până când resursa este distrusă sau jucătorul pleacă
+        {
+            // Dacă jucătorul se îndepărtează, minarea se întrerupe
+            if (Vector3.Distance(player.position, resource.transform.position) > maxMiningDistance)
+            {
+                Debug.Log("Minare întreruptă: jucătorul s-a îndepărtat prea mult.");
+                yield break;
+            }
+
+            yield return StartCoroutine(MineCoroutine(resource, player));
+
+            // Dacă resursa este distrusă după minare, oprim bucla
+            if (resource == null || resource.destroyOnMine)
+            {
+                yield break;
+            }
+        }
+    }
+
+    private IEnumerator MineCoroutine(Resource resource, Transform player)
+    {
         // Creăm efectul laser.
         GameObject laser = Instantiate(laserPrefab);
         LineRenderer lr = laser.GetComponent<LineRenderer>();
@@ -46,32 +73,25 @@ public class MiningManager : MonoBehaviour
             lr.SetPosition(0, player.position);
             lr.SetPosition(1, resource.transform.position);
         }
-        StartCoroutine(MineCoroutine(resource, player, laser));
-    }
 
-    private IEnumerator MineCoroutine(Resource resource, Transform player, GameObject laser)
-    {
-        // Instanțiem particulele din timpul minării, dacă resursa se va distruge și avem prefab-ul setat.
+        // Instanțiem particulele din timpul minării, dacă există.
         GameObject miningParticleEffect = null;
-        if (resource.destroyOnMine && miningParticlePrefab != null)
+        if (miningParticlePrefab != null)
         {
             miningParticleEffect = Instantiate(miningParticlePrefab, resource.transform.position, Quaternion.identity, resource.transform);
         }
 
-        // Folosim transformul resursei pentru a aplica efectul de shake.
         Transform minedTransform = resource.transform;
         Vector3 originalPos = minedTransform.position;
 
         float timer = 0f;
-        bool interrupted = false;
         while (timer < miningDuration)
         {
             timer += Time.deltaTime;
-            
+
             // Actualizează pozițiile laserului dacă jucătorul sau obiectul minat se mișcă.
             if (laser != null)
             {
-                LineRenderer lr = laser.GetComponent<LineRenderer>();
                 if (lr != null)
                 {
                     lr.SetPosition(0, player.position);
@@ -80,45 +100,30 @@ public class MiningManager : MonoBehaviour
             }
 
             // Aplicăm efectul de shake pe transformul minat.
-            if (resource.destroyOnMine)
-            {
-                Vector3 shakeOffset = Random.insideUnitSphere * shakeIntensity;
-                minedTransform.position = originalPos + shakeOffset;
-            }
+            Vector3 shakeOffset = Random.insideUnitSphere * shakeIntensity;
+            minedTransform.position = originalPos + shakeOffset;
 
-            // Verificăm dacă jucătorul s-a îndepărtat prea mult (doar maxim, fără nicio distanță minimă).
+            // Verificăm dacă jucătorul s-a îndepărtat prea mult.
             if (Vector3.Distance(player.position, minedTransform.position) > maxMiningDistance)
             {
                 Debug.Log("Minare întreruptă: jucătorul s-a îndepărtat prea mult.");
-                interrupted = true;
-                break;
+                Destroy(laser);
+                if (miningParticleEffect != null) Destroy(miningParticleEffect);
+                yield break;
             }
-            
+
             yield return null;
         }
-        
-        // Dacă minatul a fost întrerupt, restaurăm poziția și distrugem efectele.
-        if (interrupted)
-        {
-            minedTransform.position = originalPos;
-            Destroy(laser);
-            if (miningParticleEffect != null)
-            {
-                Destroy(miningParticleEffect);
-            }
-            yield break;
-        }
-        
-        // Restaurăm poziția originală dacă obiectul nu e distrus.
-        if (!resource.destroyOnMine)
-        {
-            minedTransform.position = originalPos;
-        }
+
+        // Restaurăm poziția obiectului
+        minedTransform.position = originalPos;
 
         // Distrugem efectul laser.
         Destroy(laser);
-        Debug.Log("Minare finalizată.");
-        
+
+        // Adăugăm resursa în inventar.
+        AddResourceToInventory(resource);
+
         // Dacă resursa trebuie distrusă:
         if (resource.destroyOnMine)
         {
@@ -127,8 +132,10 @@ public class MiningManager : MonoBehaviour
             {
                 Instantiate(finalParticlePrefab, minedTransform.position, Quaternion.identity);
             }
-            // Așteptăm puțin pentru a permite efectului final să fie vizibil.
+
+            // Așteptăm puțin pentru efectul final
             yield return new WaitForSeconds(finalEffectDelay);
+
             Destroy(resource.gameObject);
         }
         else
@@ -138,6 +145,29 @@ public class MiningManager : MonoBehaviour
             {
                 Destroy(miningParticleEffect);
             }
+        }
+    }
+
+    /// <summary>
+    /// Adaugă resursa minată în inventarul jucătorului.
+    /// </summary>
+    /// <param name="resource">Obiectul de resursă minat.</param>
+    private void AddResourceToInventory(Resource resource)
+    {
+        if (PlayerInventory.instance == null)
+        {
+            Debug.LogError("Inventory system not found!");
+            return;
+        }
+
+        if (int.TryParse(resource.resourceAmount, out int amount))
+        {
+            PlayerInventory.instance.AddItem(resource.resourceName, amount);
+            Debug.Log($"Added {amount} {resource.resourceName} to inventory.");
+        }
+        else
+        {
+            Debug.LogError($"Invalid resource amount: {resource.resourceAmount}");
         }
     }
 }

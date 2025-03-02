@@ -2,18 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PlanetType { Random, Perfect, Cold, Hot }
+public enum PlanetSize { Random, Small, Medium, Large }
+public enum PlanetDataIndex { Index0, Index1, Index2, Index3, Index4 }
+
 public class RandomPlanet : MonoBehaviour
 {
+    [Header("Planet Type")]
+    public PlanetType planetType = PlanetType.Random;
+
+    [Header("Planet Size")]
+    public PlanetSize planetSize = PlanetSize.Medium;
+
+    [Header("Main Menu Settings")]
+    public bool useMainMenuPlanetSizes = false;
+
     [Header("General Settings")]
-    [Range(2, 256)]
-    public int resolution = 10;
+    [Range(2, 256)] public int resolution = 10;
     public bool autoUpdate = true;
-    public enum FaceRenderMask { All, Top, Bottom, Left, Right, Front, Back };
+    public enum FaceRenderMask { All, Top, Bottom, Left, Right, Front, Back }
     public FaceRenderMask faceRenderMask;
 
     [Header("Planet Settings")]
-    public ShapeSettings shapeSettings;        // The shapeSettings to be generated/modified
-    public ColourSettings colourSettings;      // The colourSettings to be generated/modified
+    public ShapeSettings shapeSettings;   // Shape settings
+    public ColourSettings colourSettings; // Colour settings
 
     [Header("Randomization Settings")]
     public bool randomizeShape = true;
@@ -21,8 +33,7 @@ public class RandomPlanet : MonoBehaviour
 
     [Header("Shape Inspiration (Model)")]
     public ShapeSettings shapeInspiration;
-    [Range(0f, 1f)]
-    public float randomFactor = 0.2f;
+    [Range(0f, 1f)] public float randomFactor = 0.2f;
 
     [Header("Noise Layer Count")]
     public int minNoiseLayers = 2;
@@ -30,6 +41,13 @@ public class RandomPlanet : MonoBehaviour
 
     [Header("Foam Color")]
     public Color userFoamColor = Color.white;
+
+    [Header("Mountain Settings")]
+    public bool addMountainsAndSnowPeaks = true;
+    public float mountainStrengthMultiplier = 1.5f;
+
+    [Header("Saved Data Index (0-4)")]
+    public PlanetDataIndex planetDataIndex;
 
     ShapeGenerator shapeGenerator = new ShapeGenerator();
     ColourGenerator colourGenerator = new ColourGenerator();
@@ -40,6 +58,14 @@ public class RandomPlanet : MonoBehaviour
 
     void Start()
     {
+        // Poți apela GeneratePlanet() sau poți lăsa PlanetDataManager să facă totul
+        // GeneratePlanet();
+    }
+
+    public void GeneratePlanet()
+    {
+        // DACĂ randomizeShape e false, nu mai apelăm RandomizeShapeSettings()
+        // DACĂ randomizeColours e false, nu mai apelăm RandomizeColourSettings()
         if (randomizeShape)
         {
             RandomizeShapeSettings();
@@ -48,32 +74,133 @@ public class RandomPlanet : MonoBehaviour
         {
             RandomizeColourSettings();
         }
-        GeneratePlanet();
+
+        // Construim planeta (fie cu date random, fie cu date deja existente)
+        Initialize();
+        GenerateMesh();
+        GenerateColours();
+
+        colourSettings.planetMaterial.SetFloat("_PlanetRadius", shapeSettings.planetRadius);
+
+        // Setăm radius la collider dacă nu e meniu principal
+        if (!useMainMenuPlanetSizes)
+        {
+            SphereCollider sphereCollider = GetComponent<SphereCollider>();
+            if (sphereCollider == null)
+            {
+                sphereCollider = gameObject.AddComponent<SphereCollider>();
+            }
+            sphereCollider.radius = shapeSettings.planetRadius;
+        }
     }
 
+    void Initialize()
+    {
+        shapeGenerator.UpdateSettings(shapeSettings);
+        colourGenerator.UpdateSettings(colourSettings);
+
+        if (meshFilters == null || meshFilters.Length == 0)
+        {
+            meshFilters = new MeshFilter[6];
+        }
+        terrainFaces = new TerrainFace[6];
+
+        Vector3[] directions = {
+            Vector3.up, Vector3.down, 
+            Vector3.left, Vector3.right, 
+            Vector3.forward, Vector3.back
+        };
+
+        for (int i = 0; i < 6; i++)
+        {
+            if (meshFilters[i] == null)
+            {
+                GameObject meshObj = new GameObject("Mesh_" + directions[i]);
+                meshObj.transform.SetParent(transform, false);
+                meshObj.transform.localPosition = Vector3.zero;
+                meshObj.AddComponent<MeshRenderer>();
+                meshFilters[i] = meshObj.AddComponent<MeshFilter>();
+                meshFilters[i].sharedMesh = new Mesh();
+            }
+            meshFilters[i].GetComponent<MeshRenderer>().sharedMaterial = colourSettings.planetMaterial;
+
+            terrainFaces[i] = new TerrainFace(shapeGenerator, meshFilters[i].sharedMesh, resolution, directions[i]);
+            bool renderFace = faceRenderMask == FaceRenderMask.All || (int)faceRenderMask - 1 == i;
+            meshFilters[i].gameObject.SetActive(renderFace);
+        }
+    }
+
+    void GenerateMesh()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            if (meshFilters[i].gameObject.activeSelf)
+            {
+                terrainFaces[i].ConstructMesh();
+            }
+        }
+        colourGenerator.UpdateElevation(shapeGenerator.elevationMinMax);
+    }
+
+    public void GenerateColours()
+    {
+        colourGenerator.UpdateColours();
+    }
+
+    // ----------------------
+    // Metode de randomizare
+    // ----------------------
     void RandomizeShapeSettings()
     {
-        // 1) Asigurăm un radius peste 5
-        shapeSettings.planetRadius = Random.Range(5.1f, 10f);
+        float minRadius, maxRadius;
+        if (useMainMenuPlanetSizes)
+        {
+            switch (planetSize)
+            {
+                case PlanetSize.Small:
+                    minRadius = 4f;  maxRadius = 5.5f;  break;
+                case PlanetSize.Medium:
+                    minRadius = 5.5f;  maxRadius = 7f;  break;
+                case PlanetSize.Large:
+                    minRadius = 7f;  maxRadius = 9f;  break;
+                case PlanetSize.Random:
+                    minRadius = 4f;  maxRadius = 9f;   break;
+                default:
+                    minRadius = 5.5f; maxRadius = 7f;  break;
+            }
+        }
+        else
+        {
+            switch (planetSize)
+            {
+                case PlanetSize.Small:
+                    minRadius = 15f; maxRadius = 20f; break;
+                case PlanetSize.Medium:
+                    minRadius = 20f; maxRadius = 25f; break;
+                case PlanetSize.Large:
+                    minRadius = 25f; maxRadius = 30f; break;
+                case PlanetSize.Random:
+                    minRadius = 15f; maxRadius = 30f; break;
+                default:
+                    minRadius = 20f; maxRadius = 25f; break;
+            }
+        }
+        shapeSettings.planetRadius = Random.Range(minRadius, maxRadius);
 
-        // 2) Copiem orientarea din shapeInspiration, dacă există
         if (shapeInspiration != null)
         {
             shapeSettings.orientation = shapeInspiration.orientation;
         }
 
-        // 3) Verificăm shapeInspiration
         if (shapeInspiration == null || shapeInspiration.noiseLayers == null || shapeInspiration.noiseLayers.Length == 0)
         {
-            Debug.LogWarning("No shapeInspiration found. Using default shapeSettings (planet might look spiky).");
+            Debug.LogWarning("No shape inspiration found. Using default settings (planet might look spiky).");
             return;
         }
 
-        // -- CREĂM LISTE pentru layere Simple și Ridgid din shapeInspiration
         List<ShapeSettings.NoiseLayer> simpleSourceLayers = new List<ShapeSettings.NoiseLayer>();
         List<ShapeSettings.NoiseLayer> ridgidSourceLayers = new List<ShapeSettings.NoiseLayer>();
 
-        // Parcurgem layerele din shapeInspiration și le separăm după tip.
         foreach (var srcLayer in shapeInspiration.noiseLayers)
         {
             if (srcLayer.noiseSettings != null)
@@ -91,24 +218,22 @@ public class RandomPlanet : MonoBehaviour
             }
         }
 
-        // Dacă lipsesc complet layere de tip Simple sau Ridgid, nu putem garanta cerința
         if (simpleSourceLayers.Count == 0 || ridgidSourceLayers.Count == 0)
         {
-            Debug.LogWarning("ShapeInspiration must have at least one Simple and one Ridgid layer.");
+            Debug.LogWarning("ShapeInspiration must contain at least one Simple and one Ridgid layer.");
             return;
         }
 
-        // Aflăm numărul total de layere pe care îl vom genera
         int randomLayerCount = Random.Range(minNoiseLayers, maxNoiseLayers + 1);
         shapeSettings.noiseLayers = new ShapeSettings.NoiseLayer[randomLayerCount];
 
-        // -- PASUL 1: Cream obligatoriu 1 layer de tip Simple
+        // Primul strat: Simple
         ShapeSettings.NoiseLayer forcedSimple = CloneAndRandomizeLayer(
             simpleSourceLayers[Random.Range(0, simpleSourceLayers.Count)]
         );
         shapeSettings.noiseLayers[0] = forcedSimple;
 
-        // -- PASUL 2: Cream obligatoriu 1 layer de tip Ridgid (dacă randomLayerCount >= 2)
+        // Al doilea strat: Ridgid (dacă există loc)
         if (randomLayerCount >= 2)
         {
             ShapeSettings.NoiseLayer forcedRidgid = CloneAndRandomizeLayer(
@@ -117,20 +242,61 @@ public class RandomPlanet : MonoBehaviour
             shapeSettings.noiseLayers[1] = forcedRidgid;
         }
 
-        // -- PASUL 3: Restul layere-lor (de la 2 până la randomLayerCount - 1)
-        // pot fi alese la întâmplare din TOATE layerele sursă.
-        // (fie simpleSourceLayers, fie ridgidSourceLayers, fie *toate* shapeInspiration.noiseLayers)
-        // Aici, pentru exemplu, îi lăsăm să fie aleși din TOT shapeInspiration (Simple + Ridgid).
+        // Restul straturilor
         for (int i = 2; i < randomLayerCount; i++)
         {
             var srcLayer = shapeInspiration.noiseLayers[Random.Range(0, shapeInspiration.noiseLayers.Length)];
             shapeSettings.noiseLayers[i] = CloneAndRandomizeLayer(srcLayer);
         }
+
+        // Dacă avem munți, creștem strength-ul straturilor Ridgid
+        if (addMountainsAndSnowPeaks)
+        {
+            foreach (var layer in shapeSettings.noiseLayers)
+            {
+                if (layer.noiseSettings.filterType == NoiseSettings.FilterType.Ridgid)
+                {
+                    layer.noiseSettings.ridgidNoiseSettings.strength *= mountainStrengthMultiplier;
+                }
+            }
+        }
     }
 
-    /// <summary>
-    /// Clonează un NoiseLayer (Simple sau Ridgid) și randomizează parametrii.
-    /// </summary>
+    void RandomizeColourSettings()
+    {
+        Gradient randomGradient = new Gradient();
+
+        float time1 = Random.Range(0.1f, 0.4f);
+        float time2 = Random.Range(0.6f, 0.9f);
+
+        GradientColorKey[] colorKeys = new GradientColorKey[4];
+        colorKeys[0].color = new Color(Random.value, Random.value, Random.value);
+        colorKeys[0].time = 0f;
+        colorKeys[1].color = new Color(Random.value, Random.value, Random.value);
+        colorKeys[1].time = time1;
+        colorKeys[2].color = new Color(Random.value, Random.value, Random.value);
+        colorKeys[2].time = time2;
+        colorKeys[3].color = new Color(Random.value, Random.value, Random.value);
+        colorKeys[3].time = 1f;
+
+        GradientAlphaKey[] alphaKeys = new GradientAlphaKey[4];
+        for (int i = 0; i < alphaKeys.Length; i++)
+        {
+            alphaKeys[i].alpha = 1f;
+            alphaKeys[i].time = colorKeys[i].time;
+        }
+        randomGradient.SetKeys(colorKeys, alphaKeys);
+
+        // Assign gradient
+        colourSettings.gradient = randomGradient;
+
+        // Determinăm cea mai întunecată culoare din gradient
+        Color darkestGradientColor = FindDarkestColorInGradient(randomGradient);
+        // Și forțăm userFoamColor să fie mai întunecată, dacă e cazul
+        Color finalFoamColor = EnsureDarkerThan(userFoamColor, darkestGradientColor);
+        colourSettings.planetMaterial.SetColor("_FoamColor", finalFoamColor);
+    }
+
     ShapeSettings.NoiseLayer CloneAndRandomizeLayer(ShapeSettings.NoiseLayer srcLayer)
     {
         ShapeSettings.NoiseLayer newLayer = new ShapeSettings.NoiseLayer();
@@ -146,16 +312,15 @@ public class RandomPlanet : MonoBehaviour
             var srcSimple = srcLayer.noiseSettings.simpleNoiseSettings;
             var dstSimple = newLayer.noiseSettings.simpleNoiseSettings;
 
-            // Evităm NullRef dacă inspirația lipsește
             if (srcSimple != null)
             {
-                dstSimple.strength      = RandomizeAround(srcSimple.strength);
-                dstSimple.baseRoughness = RandomizeAround(srcSimple.baseRoughness);
-                dstSimple.roughness     = RandomizeAround(srcSimple.roughness);
-                dstSimple.persistence   = RandomizeAround(srcSimple.persistence);
-                dstSimple.centre        = srcSimple.centre + Random.insideUnitSphere * randomFactor;
-                dstSimple.minValue      = RandomizeAround(srcSimple.minValue);
-                dstSimple.numLayers     = srcSimple.numLayers;
+                dstSimple.strength        = RandomizeAround(srcSimple.strength);
+                dstSimple.baseRoughness   = RandomizeAround(srcSimple.baseRoughness);
+                dstSimple.roughness       = RandomizeAround(srcSimple.roughness);
+                dstSimple.persistence     = RandomizeAround(srcSimple.persistence);
+                dstSimple.centre          = srcSimple.centre + Random.insideUnitSphere * randomFactor;
+                dstSimple.minValue        = RandomizeAround(srcSimple.minValue);
+                dstSimple.numLayers       = srcSimple.numLayers;
             }
         }
         else // Ridgid
@@ -194,9 +359,6 @@ public class RandomPlanet : MonoBehaviour
         return Random.Range(minVal, maxVal);
     }
 
-    /// <summary>
-    /// Returnează cea mai întunecată culoare din gradient, căutând pe câteva eșantioane între 0 și 1.
-    /// </summary>
     Color FindDarkestColorInGradient(Gradient gradient)
     {
         int sampleCount = 10;
@@ -217,124 +379,15 @@ public class RandomPlanet : MonoBehaviour
         return darkestColor;
     }
 
-    /// <summary>
-    /// Forțează `colorA` să fie mai întunecată (sau egal de întunecată) decât `referenceColor`.
-    /// </summary>
     Color EnsureDarkerThan(Color colorA, Color referenceColor)
     {
         float brightnessA = (colorA.r + colorA.g + colorA.b) / 3f;
         float brightnessRef = (referenceColor.r + referenceColor.g + referenceColor.b) / 3f;
-
         if (brightnessA > brightnessRef)
         {
             float factor = brightnessRef / brightnessA;
-            return colorA * factor; 
+            return colorA * factor;
         }
         return colorA;
-    }
-
-    void RandomizeColourSettings()
-    {
-        // Creează un gradient random cu 4 puncte de culoare.
-        Gradient randomGradient = new Gradient();
-
-        float time1 = Random.Range(0.1f, 0.4f);
-        float time2 = Random.Range(0.6f, 0.9f);
-
-        GradientColorKey[] colorKeys = new GradientColorKey[4];
-        colorKeys[0].color = new Color(Random.value, Random.value, Random.value);
-        colorKeys[0].time = 0f;
-        colorKeys[1].color = new Color(Random.value, Random.value, Random.value);
-        colorKeys[1].time = time1;
-        colorKeys[2].color = new Color(Random.value, Random.value, Random.value);
-        colorKeys[2].time = time2;
-        colorKeys[3].color = new Color(Random.value, Random.value, Random.value);
-        colorKeys[3].time = 1f;
-
-        GradientAlphaKey[] alphaKeys = new GradientAlphaKey[4];
-        for (int i = 0; i < alphaKeys.Length; i++)
-        {
-            alphaKeys[i].alpha = 1f;
-            alphaKeys[i].time = colorKeys[i].time;
-        }
-        randomGradient.SetKeys(colorKeys, alphaKeys);
-
-        // Îl setăm pe planetă
-        colourSettings.gradient = randomGradient;
-
-        // Determinăm cea mai întunecată culoare
-        Color darkestGradientColor = FindDarkestColorInGradient(randomGradient);
-
-        // Apoi forțăm userFoamColor să fie (dacă e cazul) mai întunecată
-        Color finalFoamColor = EnsureDarkerThan(userFoamColor, darkestGradientColor);
-
-        // Setăm culoarea spumei în material.
-        colourSettings.planetMaterial.SetColor("_FoamColor", finalFoamColor);
-    }
-
-    void Initialize()
-    {
-        shapeGenerator.UpdateSettings(shapeSettings);
-        colourGenerator.UpdateSettings(colourSettings);
-
-        if (meshFilters == null || meshFilters.Length == 0)
-        {
-            meshFilters = new MeshFilter[6];
-        }
-        terrainFaces = new TerrainFace[6];
-
-        Vector3[] directions = 
-        { 
-            Vector3.up, 
-            Vector3.down, 
-            Vector3.left, 
-            Vector3.right, 
-            Vector3.forward, 
-            Vector3.back 
-        };
-
-        for (int i = 0; i < 6; i++)
-        {
-            if (meshFilters[i] == null)
-            {
-                GameObject meshObj = new GameObject("Mesh_" + directions[i]);
-                meshObj.transform.SetParent(transform, false);
-                meshObj.transform.localPosition = Vector3.zero;
-
-                meshObj.AddComponent<MeshRenderer>();
-                meshFilters[i] = meshObj.AddComponent<MeshFilter>();
-                meshFilters[i].sharedMesh = new Mesh();
-            }
-            meshFilters[i].GetComponent<MeshRenderer>().sharedMaterial = colourSettings.planetMaterial;
-
-            terrainFaces[i] = new TerrainFace(shapeGenerator, meshFilters[i].sharedMesh, resolution, directions[i]);
-            bool renderFace = faceRenderMask == FaceRenderMask.All || (int)faceRenderMask - 1 == i;
-            meshFilters[i].gameObject.SetActive(renderFace);
-        }
-    }
-
-    public void GeneratePlanet()
-    {
-        Initialize();
-        GenerateMesh();
-        GenerateColours();
-        colourSettings.planetMaterial.SetFloat("_PlanetRadius", shapeSettings.planetRadius);
-    }
-
-    void GenerateMesh()
-    {
-        for (int i = 0; i < 6; i++)
-        {
-            if (meshFilters[i].gameObject.activeSelf)
-            {
-                terrainFaces[i].ConstructMesh();
-            }
-        }
-        colourGenerator.UpdateElevation(shapeGenerator.elevationMinMax);
-    }
-
-    public void GenerateColours()
-    {
-        colourGenerator.UpdateColours();
     }
 }

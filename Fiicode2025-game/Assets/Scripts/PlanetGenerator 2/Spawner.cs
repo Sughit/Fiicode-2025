@@ -80,7 +80,6 @@ public class Spawner : MonoBehaviour
                     // Pentru fiecare obiect din grup, încercăm să găsim o poziție validă
                     for (int i = 0; i < groupCount; i++)
                     {
-                        bool foundValid = false;
                         for (int inner = 0; inner < 10; inner++)
                         {
                             Vector2 offset2D = Random.insideUnitCircle * spawnable.groupSpawnRadius;
@@ -89,7 +88,6 @@ public class Spawner : MonoBehaviour
                             if (IsValidCandidate(candidate, globalSpawnedPositions, groupPositions, minDistanceBetweenObjects))
                             {
                                 groupPositions.Add(candidate);
-                                foundValid = true;
                                 break;
                             }
                         }

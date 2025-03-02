@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5c681f1378ad874ab20382201b080b0, type: 3}
+  m_Name: PlanetData
+  m_EditorClassIdentifier: 
+  planets:
+  - colourSettings: {fileID: 11400000, guid: e7ead73bd39aa6f4386607fcc1f5dfd9, type: 2}
+    shapeSettings: {fileID: 11400000, guid: e0c12fc1632e2b143a228e4cde04fb90, type: 2}
+  - colourSettings: {fileID: 11400000, guid: fb8ed43d7eaaef54abe9d5e998486b5c, type: 2}
+    shapeSettings: {fileID: 11400000, guid: b65fd871ac473f44c803b981e089f34e, type: 2}
+  - colourSettings: {fileID: 11400000, guid: 7ead80ed2b901c04083a1ff6c352f2cd, type: 2}
+    shapeSettings: {fileID: 11400000, guid: 479c52494924aa9499a907fbb7754eeb, type: 2}
+  - colourSettings: {fileID: 11400000, guid: fa5749adedf05e846b506b9bfcb79f38, type: 2}
+    shapeSettings: {fileID: 11400000, guid: 838581c8497cea540b386bb24e616d11, type: 2}
+  - colourSettings: {fileID: 11400000, guid: 584325c51ac50ed4fb89db070a30d4db, type: 2}
+    shapeSettings: {fileID: 11400000, guid: ef79bb26a4b0e9b4fb4c8010196e178e, type: 2}
