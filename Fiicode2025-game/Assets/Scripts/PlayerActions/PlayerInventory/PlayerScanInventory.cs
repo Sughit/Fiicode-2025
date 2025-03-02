@@ -28,6 +28,7 @@ public class PlayerScanInventory : MonoBehaviour
         if (ModifyVariable(inventory, itemName, true))
         {
             Debug.Log($"Unlocked {itemName}.");
+            NotificationManager.instance.ShowNotification($"Unlocked {itemName}.");
             SaveInventory(); // Save after adding
         }
         else
@@ -96,6 +97,32 @@ public class PlayerScanInventory : MonoBehaviour
         }
     }
 
+    public bool IsUnlocked(string itemName)
+    {
+        if (inventory == null)
+        {
+            Debug.LogError("PlayerScanInventory: ScanInventory ScriptableObject is not assigned!");
+            return false;
+        }
+
+        // Reflectăm în inventory ca să găsim câmpul bool cu numele itemName
+        System.Type type = inventory.GetType();
+        var field = type.GetField(itemName,
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+        // Dacă există câmp și e de tip bool, îl returnăm
+        if (field != null && field.FieldType == typeof(bool))
+        {
+            bool currentValue = (bool)field.GetValue(inventory);
+            return currentValue;
+        }
+
+        // Dacă nu am găsit câmpul respectiv, atenționăm și returnăm false
+        Debug.LogWarning($"Discovery '{itemName}' not found in scanning inventory.");
+        return false;
+    }
+
+
     /// <summary>
     /// Resets the inventory to its default values.
     /// </summary>
@@ -109,6 +136,7 @@ public class PlayerScanInventory : MonoBehaviour
         inventory.water = false;
         inventory.petrolium = false;
         inventory.clay = false;
+        inventory.brick = false;
         inventory.copper = false;
         SaveInventory(); // Save the reset values to avoid re-resetting
     }

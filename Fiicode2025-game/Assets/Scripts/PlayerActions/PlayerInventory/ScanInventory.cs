@@ -11,5 +11,6 @@ public class ScanInventory : ScriptableObject
     public bool water;
     public bool petrolium;
     public bool clay;
+    public bool brick;
     public bool copper;
 }
