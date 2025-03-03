@@ -40,7 +40,7 @@ Material:
     - _GrassThreshold: 0.4
     - _GrassWindSpeed: 2
     - _GrassWindStrength: 0.4
-    - _MaxHeight: 0.4
+    - _MaxHeight: 1.24
     - _MinHeight: 0
     - _PlanetRadius: 20
     - _WaterHeight: 0

@@ -36,13 +36,16 @@ public class PlayerController : MonoBehaviour
 
         moveAction.performed += OnMovePerformed;
         moveAction.canceled += OnMoveCanceled;
-        interactAction.performed += ctx => OnInteract?.Invoke();
+        interactAction.performed += ctx => 
+        {
+            if(!PlayerBuild.IsBuildingModeActive) OnInteract?.Invoke();
+        };
         openResearchMenuAction.performed += ctx => OnOpenResearchMenu?.Invoke();
         openBuildingMenuAction.performed += ctx => OnOpenBuildingMenu?.Invoke();
         // Check interaction state before firing an attack.
         attackAction.performed += ctx =>
         {
-            if (interactionCam != null && !interactionCam.gameObject.activeSelf) OnAttack?.Invoke();
+            if (interactionCam != null && !interactionCam.gameObject.activeSelf && !PlayerBuild.IsBuildingModeActive) OnAttack?.Invoke();
         };
         togglePlanetSpaceAction.performed += ctx => OnTogglePlanetSpace?.Invoke();
     }
