@@ -21,10 +21,19 @@ public class CameraController : MonoBehaviour
     // Obiectul care va fi urmărit de Cinemachine
     private Transform cameraFollowTarget;
 
-    // NOU: un unghi de rotație pentru camera, modificat de mouse.
-    private float yawAngle = 0f;
+    // Unghiul de rotație pentru camera, modificat de mouse.
+    private float yawAngle = 0f; // Rotație pe axa orizontală (Yaw)
+    private float pitchAngle = 0f; // Rotație pe axa verticală (Pitch)
     [Tooltip("Viteză de rotație cu mouse-ul pe orizontală")]
     [SerializeField] private float rotationSpeed = 3f;
+    [Tooltip("Viteză de rotație cu mouse-ul pe verticală")]
+    [SerializeField] private float verticalRotationSpeed = 2f;
+
+    [Header("Limite Rotație Verticală")]
+    [Tooltip("Limita minimă pentru rotația pe axa Y (în grade)")]
+    [SerializeField] private float minPitch = -40f;
+    [Tooltip("Limita maximă pentru rotația pe axa Y (în grade)")]
+    [SerializeField] private float maxPitch = 80f;
 
     void Start()
     {
@@ -57,7 +66,7 @@ public class CameraController : MonoBehaviour
         Vector3 desiredPosition = player.position + player.TransformDirection(offset);
         cameraFollowTarget.position = Vector3.Lerp(
             cameraFollowTarget.position, 
-            desiredPosition, 
+            player.position, 
             10f * Time.deltaTime
         );
 
@@ -70,15 +79,23 @@ public class CameraController : MonoBehaviour
         if (correctedForward.sqrMagnitude < 0.001f)
             correctedForward = playerForward;
 
-        // 4) NOU: citim mouseX și actualizăm yaw-ul
-        float mouseX = Input.GetAxis("Mouse X"); 
+        // 4) Citim mouseX și actualizăm yaw-ul (rotirea pe orizontală)
+        float mouseX = Input.GetAxis("Mouse X");
         yawAngle += mouseX * rotationSpeed;
 
-        // 5) Construim un vector forward rotit în jurul lui planetUp cu yawAngle
-        Quaternion yawRotation = Quaternion.AngleAxis(yawAngle, planetUp);
-        Vector3 finalForward = yawRotation * correctedForward;
+        // 5) Citim mouseY și actualizăm pitch-ul (rotirea pe verticală) cu limite
+        float mouseY = Input.GetAxis("Mouse Y");
+        pitchAngle += mouseY * verticalRotationSpeed;  // scădem pentru a obține o mișcare corectă (mărește unghiul când miști în sus)
+        pitchAngle = Mathf.Clamp(pitchAngle, minPitch, maxPitch); // Aplicăm limitele
 
-        // 6) Construim desiredRotation și îl aplicăm cu un slerp (smooth)
+        // 6) Calculăm rotația finală pe orizontală și verticală
+        Quaternion yawRotation = Quaternion.AngleAxis(yawAngle, planetUp); // Rotire pe axa orizontală
+        Quaternion pitchRotation = Quaternion.AngleAxis(pitchAngle, transform.right); // Rotire pe axa verticală
+
+        // 7) Calculăm forward-ul final rotit
+        Vector3 finalForward = yawRotation * pitchRotation * correctedForward;
+
+        // 8) Construim desiredRotation și îl aplicăm cu un Slerp pentru a face tranzițiile mai line
         Quaternion desiredRotation = Quaternion.LookRotation(finalForward, planetUp);
         cameraFollowTarget.rotation = Quaternion.Slerp(
             cameraFollowTarget.rotation,
