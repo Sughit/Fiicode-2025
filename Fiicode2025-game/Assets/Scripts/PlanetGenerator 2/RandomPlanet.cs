@@ -55,11 +55,16 @@ public class RandomPlanet : MonoBehaviour
     [SerializeField, HideInInspector]
     MeshFilter[] meshFilters;
     TerrainFace[] terrainFaces;
+    Animator anim;
 
     void Start()
     {
         // Poți apela GeneratePlanet() sau poți lăsa PlanetDataManager să facă totul
         if(useMainMenuPlanetSizes) GeneratePlanet();
+    }
+    public void Animatie()
+    {
+        anim.SetTrigger("pop");
     }
 
     public void GeneratePlanet()
