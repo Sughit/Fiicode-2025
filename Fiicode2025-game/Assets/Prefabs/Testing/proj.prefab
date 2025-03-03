@@ -101,8 +101,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   planet: {fileID: 0}
-  gravityStrength: 10
+  gravityStrength: 5
   rotationSpeed: 10
+  lifeTime: 3
 --- !u!54 &3819424157117961760
 Rigidbody:
   m_ObjectHideFlags: 0
