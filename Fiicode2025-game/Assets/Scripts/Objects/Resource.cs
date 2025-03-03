@@ -1,15 +1,34 @@
 using UnityEngine;
-using System.Reflection;
+using System.Collections.Generic;
+
+[System.Serializable]
+public class ResourceDrop
+{
+    [Tooltip("Numele item-ului (trebuie să existe în Inventory).")]
+    public string itemName;
+
+    [Tooltip("Cantitatea minimă care poate cădea.")]
+    public int minAmount;
+
+    [Tooltip("Cantitatea maximă care poate cădea.")]
+    public int maxAmount;
+
+    [Range(0f, 1f), Tooltip("Probabilitatea de a pica acest item (0 - 1).")]
+    public float dropChance;
+}
 
 public class Resource : Interactable
 {
     [Tooltip("Dacă este true, resursa va fi distrusă după minare.")]
     public bool destroyOnMine = false;
     
-    [Tooltip("Numele resursei, care trebuie să corespundă cu numele câmpului din ScanInventory (ex: \"iron\").")]
-    public string resourceName;
-    public string resourceAmount;
+    // -----------------
+    // Noul sistem de drops multiple cu probabilități
+    // -----------------
+    [Tooltip("Lista de iteme care pot fi obținute la minarea acestei resurse, cu probabilități individuale.")]
+    public List<ResourceDrop> resourceDrops;
     [SerializeField] private GameObject scanningObj;
+    [SerializeField] private string requiredDiscovery;
 
     /// <summary>
     /// Metoda de interacțiune a resursei.
@@ -20,7 +39,7 @@ public class Resource : Interactable
     public override void Interact(Transform player)
     {
         Debug.Log("Sunt chemat");
-        if (!IsResourceDiscovered())
+        if (!PlayerScanInventory.instance.IsUnlocked(requiredDiscovery))
         {
             // Resursa nu a fost descoperită: efectuăm scanarea și o deblocăm.
             scanningObj.SetActive(true);
@@ -30,30 +49,12 @@ public class Resource : Interactable
         {
             // Resursa este deja descoperită: inițiem minarea.
             MiningManager.instance.MineResource(this, player);
-            Debug.Log($"Resursa '{resourceName}' a fost scanată. Acum o poți mina.");
         }
     }
 
     public override void CompletedScanLogic()
     {
         scanningObj.SetActive(false);
-        PlayerScanInventory.instance.Unlock(resourceName);
-    }
-
-    /// <summary>
-    /// Verifică dacă resursa a fost descoperită în inventarul de scanare al jucătorului.
-    /// Se folosește reflection pentru a accesa câmpul din ScanInventory.
-    /// </summary>
-    /// <returns>True dacă resursa este descoperită, altfel false.</returns>
-    private bool IsResourceDiscovered()
-    {
-        var inventory = PlayerScanInventory.instance.inventory;
-        System.Type type = inventory.GetType();
-        FieldInfo field = type.GetField(resourceName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        if (field != null && field.FieldType == typeof(bool))
-        {
-            return (bool)field.GetValue(inventory);
-        }
-        return false;
+        PlayerScanInventory.instance.Unlock(requiredDiscovery);
     }
 }

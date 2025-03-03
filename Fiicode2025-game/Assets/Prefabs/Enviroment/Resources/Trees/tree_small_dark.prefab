@@ -144,9 +144,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   destroyOnMine: 1
-  resourceName: wood
-  resourceAmount: 60
+  resourceDrops:
+  - itemName: wood
+    minAmount: 25
+    maxAmount: 60
+    dropChance: 1
+  - itemName: sappling
+    minAmount: 1
+    maxAmount: 3
+    dropChance: 0.5
   scanningObj: {fileID: 3069706273259017489}
+  requiredDiscovery: wood
 --- !u!1 &3069706273259017489
 GameObject:
   m_ObjectHideFlags: 0

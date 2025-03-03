@@ -128,10 +128,24 @@ public class PlayerInventory : MonoBehaviour
     /// </summary>
     public void ResetInventory()
     {
-        inventory.wood = 0;
-        inventory.stone = 0;
-        inventory.gold = 0;
-        inventory.silver = 0;
-        SaveInventory(); // Save the reset values to avoid re-resetting
+        // Obținem tipul ScriptableObject-ului care reprezintă inventarul
+        System.Type type = inventory.GetType();
+
+        // Obținem toate câmpurile (publice sau private) de instanță
+        FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+        foreach (FieldInfo field in fields)
+        {
+            // Dacă tipul câmpului este int, îl setăm la 0
+            if (field.FieldType == typeof(int))
+            {
+                field.SetValue(inventory, 0);
+            }
+        }
+
+        // Salvăm inventarul după ce l-am resetat
+        SaveInventory();
+
+        Debug.Log("Inventory has been reset to 0 for all int fields.");
     }
 }
