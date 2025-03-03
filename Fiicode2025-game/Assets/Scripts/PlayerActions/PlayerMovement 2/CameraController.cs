@@ -19,7 +19,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Vector3 offset = new Vector3(0, 2, -4);
 
     // Obiectul care va fi urmărit de Cinemachine
-    private Transform cameraFollowTarget;
+    [SerializeField]private Transform cameraFollowTarget;
 
     // Unghiul de rotație pentru camera, modificat de mouse.
     private float yawAngle = 0f; // Rotație pe axa orizontală (Yaw)
