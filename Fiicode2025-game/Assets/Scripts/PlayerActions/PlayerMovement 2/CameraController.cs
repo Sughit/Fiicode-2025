@@ -45,10 +45,6 @@ public class CameraController : MonoBehaviour
             return;
         }
 
-        // Creăm un obiect auxiliar pentru Follow
-        GameObject followTarget = new GameObject("CameraFollowTarget");
-        cameraFollowTarget = followTarget.transform;
-
         // Poziționăm target-ul inițial relativ la jucător
         cameraFollowTarget.position = player.position + player.TransformDirection(offset);
 
