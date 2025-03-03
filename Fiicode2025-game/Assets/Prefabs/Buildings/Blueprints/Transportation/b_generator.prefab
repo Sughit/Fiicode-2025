@@ -225,7 +225,8 @@ MonoBehaviour:
   colorThreshold: 0.3
   requiredPrefabs: []
   requiredPrefabsMaxDistance: 3
-  prohibitedPrefabs: []
+  prohibitedPrefabs:
+  - {fileID: 7398052635977987723, guid: 7985a819d49e17243a1cb78c82dadba6, type: 3}
   prohibitedPrefabsMinDistance: 3
   canvas: {fileID: 5052792611795177755}
   errorText: {fileID: 7725775153803488203}
