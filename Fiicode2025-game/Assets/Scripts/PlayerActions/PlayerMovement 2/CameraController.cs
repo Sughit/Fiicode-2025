@@ -57,7 +57,8 @@ public class CameraController : MonoBehaviour
         virtualCamera.LookAt = player;
     }
 
-    void LateUpdate()
+
+    void FixedUpdate()
     {
         if (player == null || cameraFollowTarget == null || planetCenter == null)
             return;
