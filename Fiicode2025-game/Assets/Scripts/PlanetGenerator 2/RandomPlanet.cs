@@ -55,7 +55,7 @@ public class RandomPlanet : MonoBehaviour
     [SerializeField, HideInInspector]
     MeshFilter[] meshFilters;
     TerrainFace[] terrainFaces;
-    Animator anim;
+    [SerializeField] private Animator anim;
 
     void Start()
     {

@@ -279,7 +279,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1859127814}
         m_TargetAssemblyTypeName: RandomPlanet, Assembly-CSharp
-        m_MethodName: GeneratePlanet
+        m_MethodName: Animatie
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1701,6 +1701,7 @@ MonoBehaviour:
   mountainStrengthMultiplier: 1.5
   planetDataIndex: 0
   meshFilters: []
+  anim: {fileID: 1859127811}
 --- !u!1 &2140450108
 GameObject:
   m_ObjectHideFlags: 0
