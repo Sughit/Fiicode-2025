@@ -59,7 +59,7 @@ public class RandomPlanet : MonoBehaviour
     void Start()
     {
         // Poți apela GeneratePlanet() sau poți lăsa PlanetDataManager să facă totul
-        // GeneratePlanet();
+        GeneratePlanet();
     }
 
     public void GeneratePlanet()
