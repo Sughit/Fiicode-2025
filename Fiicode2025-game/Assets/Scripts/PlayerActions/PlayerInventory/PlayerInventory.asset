@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eedcdd1e18d95154ea9ce8d53de6c4b1, type: 3}
   m_Name: PlayerInventory
   m_EditorClassIdentifier: 
-  wood: 0
+  wood: 291
   stone: 0
+  iron: 0
   gold: 0
   silver: 0
+  sappling: 9
+  coal: 0
+  clay: 0
+  copper: 0
+  brick: 0

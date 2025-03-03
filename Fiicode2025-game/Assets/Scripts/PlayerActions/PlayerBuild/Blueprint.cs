@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI; // dacă folosești UI clasic. (Pentru Text, de exemplu)
+// Sau, dacă folosești TextMeshPro, inlocuiește cu: using TMPro;
 
 public class Blueprint : MonoBehaviour
 {
@@ -18,8 +20,29 @@ public class Blueprint : MonoBehaviour
     [Tooltip("Toleranța pentru compararea culorilor (doar r, g, b).")]
     [SerializeField] private float colorThreshold = 0.3f;
 
+    // --- NOU: Restricții suplimentare ---
+    [Header("Extra Placement Restrictions")]
+    [Tooltip("Prefab-urile față de care trebuie să fim aproape (la o distanță maximă).")]
+    [SerializeField] private GameObject[] requiredPrefabs;
+    [SerializeField] private float requiredPrefabsMaxDistance = 3f;
+
+    [Tooltip("Prefab-urile de care trebuie să fim departe (la o distanță minimă).")]
+    [SerializeField] private GameObject[] prohibitedPrefabs;
+    [SerializeField] private float prohibitedPrefabsMinDistance = 3f;
+
+    [Header("UI Feedback (Opțional)")]
+    [Tooltip("Canvas care conține textul de eroare, dacă e nevoie să afișezi motivul invalidării.")]
+    [SerializeField] private Canvas canvas;
+
+    [Tooltip("Text UI (sau TextMeshPro) unde afișăm motivul invalidării.")]
+    [SerializeField] private Text errorText;
+    // Dacă folosești TextMeshPro, pune `TMP_Text errorText;` și folosește `errorText.text = ...`
+
     // Proprietate publică pentru a afla dacă plasarea este validă.
     public bool CanPlace { get; private set; } = true;
+
+    // Stocăm motivul invalidării, dacă există
+    public string InvalidReason { get; private set; } = "";
 
     private Renderer[] renderers;
     private Collider[] colliders;
@@ -29,37 +52,72 @@ public class Blueprint : MonoBehaviour
         // Obținem toate componentele Renderer și Collider din blueprint (și copii).
         renderers = GetComponentsInChildren<Renderer>();
         colliders = GetComponentsInChildren<Collider>();
+
+        // Asigurăm Canvasul să fie World Space și să aibă camera principală.
+        if (canvas != null)
+        {
+            canvas.renderMode = RenderMode.WorldSpace;
+            canvas.worldCamera = Camera.main;
+
+            // Ascundem canvasul la start (poți comenta linia dacă vrei să fie mereu vizibil).
+            canvas.gameObject.SetActive(false);
+        }
     }
 
     void Update()
     {
         CheckPlacement();
         UpdateColor();
+
+        // Dacă avem un text de eroare în inspector, îl actualizăm:
+        if (errorText != null && canvas != null)
+        {
+            if (CanPlace)
+            {
+                errorText.text = ""; 
+                canvas.gameObject.SetActive(false);
+            }
+            else
+            {
+                errorText.text = InvalidReason;
+                canvas.gameObject.SetActive(true);
+            }
+        }
+
+        // NOU: Asigurăm că Canvas-ul rămâne mereu paralel cu ecranul (billboard).
+        if (canvas != null && Camera.main != null)
+        {
+            // Canvasul se orientează după direcția camerei.
+            canvas.transform.forward = Camera.main.transform.forward;
+        }
     }
 
     /// <summary>
     /// Verifică dacă zona definită de toate collider-ele din blueprint este liberă de obstacole,
     /// ignorând coliziunile cu propriile componente, și dacă suprafața de plasare are o culoare permisă.
-    /// Se folosește aceeași metodă de determinare a culorii ca în Spawner.cs, cu un threshold pentru toleranță.
+    /// De asemenea, verifică noile restricții (requiredPrefabs / prohibitedPrefabs).
     /// </summary>
     void CheckPlacement()
     {
+        // Implicit, considerăm că e valid și nu avem niciun motiv de invalidare
+        bool valid = true;
+        InvalidReason = "";
+
         if (colliders.Length == 0)
         {
+            // Dacă nu avem collidere, considerăm valid (sau poți considera invalid)
             CanPlace = true;
             return;
         }
 
-        // Calculăm un Bounds combinat din toate collider-ele.
+        // 1) Verificăm coliziunile folosind OverlapBox
         Bounds combinedBounds = colliders[0].bounds;
         for (int i = 1; i < colliders.Length; i++)
         {
             combinedBounds.Encapsulate(colliders[i].bounds);
         }
 
-        // Verificăm coliziunile folosind OverlapBox.
         Collider[] hits = Physics.OverlapBox(combinedBounds.center, combinedBounds.extents, transform.rotation, placementObstacles);
-        bool valid = true;
         foreach (Collider hit in hits)
         {
             bool isOwnCollider = false;
@@ -74,20 +132,20 @@ public class Blueprint : MonoBehaviour
             if (!isOwnCollider)
             {
                 valid = false;
+                InvalidReason = "Se suprapune cu un obstacol!";
                 break;
             }
         }
 
-        // Dacă plasarea este încă validă și se specifică culori permise, verificăm culoarea suprafeței.
+        // 2) Dacă încă e valid și avem culori permise, verificăm culoarea suprafeței
         if (valid && allowedColors.Length > 0)
         {
-            // Lansăm ray-ul de la o poziție puțin deasupra centrului bounds-ului, în jos.
             Ray ray = new Ray(combinedBounds.center + Vector3.up * 1f, Vector3.down);
             RaycastHit[] rayHits = Physics.RaycastAll(ray, 5f);
             RaycastHit selectedHit = new RaycastHit();
             bool foundValidHit = false;
 
-            // Căutăm primul hit care nu aparține blueprint-ului (sau copiilor lui)
+            // Căutăm primul hit care nu aparține blueprint-ului
             foreach (RaycastHit h in rayHits)
             {
                 bool isOwnCollider = false;
@@ -122,21 +180,22 @@ public class Blueprint : MonoBehaviour
 
                     if (gradientTexture != null)
                     {
-                        // Calculăm înălțimea similar cu Spawner.cs:
                         float height = selectedHit.point.magnitude - planetRadius;
                         float t = Mathf.InverseLerp(minHeight, maxHeight, height);
                         t = Mathf.Clamp01(t);
-                        // Obținem culoarea din textura gradient
                         surfaceColor = gradientTexture.GetPixelBilinear(t, 0.5f);
                     }
                     else
                     {
                         // Fallback: folosim culoarea materialului
-                        surfaceColor = planetMat.HasProperty("_BaseColor") ? planetMat.GetColor("_BaseColor") : planetMat.color;
+                        // Evităm direct planetMat.color, în caz că nu există _Color 
+                        if (planetMat.HasProperty("_BaseColor"))
+                            surfaceColor = planetMat.GetColor("_BaseColor");
+                        else
+                            surfaceColor = planetMat.color;
                     }
                 }
 
-                // Comparăm culoarea obținută cu cele din allowedColors, ignorând canalul alfa.
                 bool colorAllowed = false;
                 foreach (Color allowed in allowedColors)
                 {
@@ -148,17 +207,60 @@ public class Blueprint : MonoBehaviour
                         break;
                     }
                 }
+
                 if (!colorAllowed)
                 {
                     valid = false;
+                    InvalidReason = "Culoarea suprafeței nu este permisă!";
                 }
             }
             else
             {
                 valid = false;
+                InvalidReason = "Nu s-a găsit o suprafață validă sub blueprint!";
             }
         }
 
+        // 3) Verificăm requiredPrefabs (trebuie să fie aproape de minim unul)
+        if (valid && requiredPrefabs != null && requiredPrefabs.Length > 0)
+        {
+            bool foundAnyClose = false;
+
+            foreach (GameObject req in requiredPrefabs)
+            {
+                if (req == null) continue; 
+                float dist = Vector3.Distance(combinedBounds.center, req.transform.position);
+                if (dist <= requiredPrefabsMaxDistance)
+                {
+                    foundAnyClose = true;
+                    break;
+                }
+            }
+
+            if (!foundAnyClose)
+            {
+                valid = false;
+                InvalidReason = $"Nu există un obiect necesar în raza de {requiredPrefabsMaxDistance}m!";
+            }
+        }
+
+        // 4) Verificăm prohibitedPrefabs (trebuie să fim la distanță mai mare)
+        if (valid && prohibitedPrefabs != null && prohibitedPrefabs.Length > 0)
+        {
+            foreach (GameObject prohib in prohibitedPrefabs)
+            {
+                if (prohib == null) continue;
+                float dist = Vector3.Distance(combinedBounds.center, prohib.transform.position);
+                if (dist < prohibitedPrefabsMinDistance)
+                {
+                    valid = false;
+                    InvalidReason = $"Prea aproape de un obiect interzis (distanță minimă: {prohibitedPrefabsMinDistance}m)!";
+                    break;
+                }
+            }
+        }
+
+        // Final: setăm flag-ul CanPlace
         CanPlace = valid;
     }
 
