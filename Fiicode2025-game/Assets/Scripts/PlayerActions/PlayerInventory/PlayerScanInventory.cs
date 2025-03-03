@@ -128,16 +128,23 @@ public class PlayerScanInventory : MonoBehaviour
     /// </summary>
     public void ResetInventory()
     {
-        inventory.iron = false;
-        inventory.gold = false;
-        inventory.coal = false;
-        inventory.wood = false;
-        inventory.stone = false;
-        inventory.water = false;
-        inventory.petrolium = false;
-        inventory.clay = false;
-        inventory.brick = false;
-        inventory.copper = false;
-        SaveInventory(); // Save the reset values to avoid re-resetting
+        // Obținem tipul ScriptableObject-ului care reprezintă scan-inventory
+        System.Type type = inventory.GetType();
+
+        // Obținem toate câmpurile (publice sau private) de instanță
+        FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+        foreach (FieldInfo field in fields)
+        {
+            // Dacă tipul câmpului este bool, îl setăm la false
+            if (field.FieldType == typeof(bool))
+            {
+                field.SetValue(inventory, false);
+            }
+        }
+
+        // Salvăm inventarul după ce l-am resetat
+        SaveInventory();
+        Debug.Log("ScanInventory has been reset (all bool fields set to false).");
     }
 }
