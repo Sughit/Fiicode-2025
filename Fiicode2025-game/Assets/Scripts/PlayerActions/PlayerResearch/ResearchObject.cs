@@ -22,6 +22,7 @@ public class ResearchObject
     [Header("Research Info")]
     [SerializeField] private string researchName;
     [SerializeField] private bool isCompleted = false;
+    [SerializeField] private bool unlockBuilding = true;
 
     [Header("Requirements")]
     [SerializeField] private ResourceRequirement[] resourceRequirements; 
@@ -29,6 +30,7 @@ public class ResearchObject
 
     [Header("Unlock on Completion")]
     [SerializeField] private string[] unlockDiscoveries;
+    [SerializeField] private GameObject[] unlockBuildings;
     [SerializeField] private GameObject[] nextResearch;
 
     [Header("Tooltip UI")]
@@ -145,7 +147,14 @@ public class ResearchObject
                 research.SetActive(true);
             }
         }
-        // NotificationManager etc. - logica suplimentară
+
+        if(unlockBuilding)
+        {
+            foreach(GameObject building in unlockBuildings)
+            {
+                building.SetActive(true);
+            }
+        }
     }
 
     private int GetResourceAmount(string resourceName)
