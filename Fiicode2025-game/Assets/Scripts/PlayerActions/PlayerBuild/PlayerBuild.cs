@@ -91,6 +91,9 @@ public class PlayerBuild : MonoBehaviour
         {
             buildingMenu.SetActive(true);
         }
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     /// <summary>
@@ -110,6 +113,9 @@ public class PlayerBuild : MonoBehaviour
             currentBlueprint = null;
             blueprint = null;
         }
+
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     /// <summary>

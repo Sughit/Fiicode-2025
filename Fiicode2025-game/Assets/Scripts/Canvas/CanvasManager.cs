@@ -6,6 +6,7 @@ public class CanvasManager : MonoBehaviour
 {
     // Meniul "principal" unde ai categoriile de research (din codul anterior)
     [SerializeField] private GameObject researchMenu;
+    [SerializeField] private GameObject tooltip;
     [SerializeField] private GameObject[] researchMenus;
 
     // Meniuri separate pentru fiecare tip de clădire
@@ -34,7 +35,18 @@ public class CanvasManager : MonoBehaviour
     #region ResearchMenu
     public void ToggleResearchMenu()
     {
+        tooltip.SetActive(false);
         researchMenu.SetActive(!researchMenu.activeSelf);
+        if(researchMenu.activeSelf)
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+        else
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
     }
 
     public void OpenResearchMenuCategory(GameObject menu)
