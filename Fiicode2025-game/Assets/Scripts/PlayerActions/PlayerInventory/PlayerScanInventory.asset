@@ -14,14 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   iron: 0
   gold: 0
+  silver: 1
   coal: 0
-  wood: 0
+  wood: 1
   stone: 0
   water: 0
   petrolium: 0
   clay: 0
   brick: 0
-  copper: 0
+  copper: 1
   sMine1: 0
   sMine2: 0
   fMine1: 0

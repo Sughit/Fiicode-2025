@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI; // dacă folosești UI clasic. (Pentru Text, de exemplu)
-// Sau, dacă folosești TextMeshPro, inlocuiește cu: using TMPro;
+// Sau, dacă folosești TextMeshPro, înlocuiește cu: using TMPro;
 
 public class Blueprint : MonoBehaviour
 {
@@ -20,8 +20,8 @@ public class Blueprint : MonoBehaviour
     [Tooltip("Toleranța pentru compararea culorilor (doar r, g, b).")]
     [SerializeField] private float colorThreshold = 0.3f;
 
-    // --- NOU: Restricții suplimentare ---
-    [Header("Extra Placement Restrictions")]
+    // --- Restricții suplimentare pe bază de prefab-uri ---
+    [Header("Extra Placement Restrictions (Prefab-based)")]
     [Tooltip("Prefab-urile față de care trebuie să fim aproape (la o distanță maximă).")]
     [SerializeField] private GameObject[] requiredPrefabs;
     [SerializeField] private float requiredPrefabsMaxDistance = 3f;
@@ -29,6 +29,16 @@ public class Blueprint : MonoBehaviour
     [Tooltip("Prefab-urile de care trebuie să fim departe (la o distanță minimă).")]
     [SerializeField] private GameObject[] prohibitedPrefabs;
     [SerializeField] private float prohibitedPrefabsMinDistance = 3f;
+
+    // --- Restricții suplimentare pe bază de tag-uri ---
+    [Header("Extra Placement Restrictions (Tag-based)")]
+    [Tooltip("Tag-urile obiectelor de care trebuie să fim aproape (la o distanță maximă).")]
+    [SerializeField] private string[] requiredTags;
+    [SerializeField] private float requiredTagsMaxDistance = 3f;
+
+    [Tooltip("Tag-urile obiectelor de care trebuie să fim departe (la o distanță minimă).")]
+    [SerializeField] private string[] prohibitedTags;
+    [SerializeField] private float prohibitedTagsMinDistance = 3f;
 
     [Header("UI Feedback (Opțional)")]
     [Tooltip("Canvas care conține textul de eroare, dacă e nevoie să afișezi motivul invalidării.")]
@@ -58,7 +68,6 @@ public class Blueprint : MonoBehaviour
         {
             canvas.renderMode = RenderMode.WorldSpace;
             canvas.worldCamera = Camera.main;
-
             // Ascundem canvasul la start (poți comenta linia dacă vrei să fie mereu vizibil).
             canvas.gameObject.SetActive(false);
         }
@@ -84,10 +93,9 @@ public class Blueprint : MonoBehaviour
             }
         }
 
-        // NOU: Asigurăm că Canvas-ul rămâne mereu paralel cu ecranul (billboard).
+        // Asigurăm că Canvas-ul rămâne mereu paralel cu ecranul (billboard).
         if (canvas != null && Camera.main != null)
         {
-            // Canvasul se orientează după direcția camerei.
             canvas.transform.forward = Camera.main.transform.forward;
         }
     }
@@ -95,7 +103,7 @@ public class Blueprint : MonoBehaviour
     /// <summary>
     /// Verifică dacă zona definită de toate collider-ele din blueprint este liberă de obstacole,
     /// ignorând coliziunile cu propriile componente, și dacă suprafața de plasare are o culoare permisă.
-    /// De asemenea, verifică noile restricții (requiredPrefabs / prohibitedPrefabs).
+    /// De asemenea, verifică noile restricții (pe bază de prefab-uri și tag-uri).
     /// </summary>
     void CheckPlacement()
     {
@@ -187,8 +195,6 @@ public class Blueprint : MonoBehaviour
                     }
                     else
                     {
-                        // Fallback: folosim culoarea materialului
-                        // Evităm direct planetMat.color, în caz că nu există _Color 
                         if (planetMat.HasProperty("_BaseColor"))
                             surfaceColor = planetMat.GetColor("_BaseColor");
                         else
@@ -225,7 +231,6 @@ public class Blueprint : MonoBehaviour
         if (valid && requiredPrefabs != null && requiredPrefabs.Length > 0)
         {
             bool foundAnyClose = false;
-
             foreach (GameObject req in requiredPrefabs)
             {
                 if (req == null) continue; 
@@ -236,7 +241,6 @@ public class Blueprint : MonoBehaviour
                     break;
                 }
             }
-
             if (!foundAnyClose)
             {
                 valid = false;
@@ -257,6 +261,53 @@ public class Blueprint : MonoBehaviour
                     InvalidReason = $"Prea aproape de un obiect interzis (distanță minimă: {prohibitedPrefabsMinDistance}m)!";
                     break;
                 }
+            }
+        }
+
+        // 5) Verificăm requiredTags (trebuie să fim aproape de cel puțin un obiect care are unul din tag-urile necesare)
+        if (valid && requiredTags != null && requiredTags.Length > 0)
+        {
+            bool foundAnyCloseTag = false;
+            foreach (string reqTag in requiredTags)
+            {
+                GameObject[] objs = GameObject.FindGameObjectsWithTag(reqTag);
+                foreach (GameObject obj in objs)
+                {
+                    float dist = Vector3.Distance(combinedBounds.center, obj.transform.position);
+                    if (dist <= requiredTagsMaxDistance)
+                    {
+                        foundAnyCloseTag = true;
+                        break;
+                    }
+                }
+                if (foundAnyCloseTag)
+                    break;
+            }
+            if (!foundAnyCloseTag)
+            {
+                valid = false;
+                InvalidReason = $"Nu există un obiect cu tag necesar în raza de {requiredTagsMaxDistance}m!";
+            }
+        }
+
+        // 6) Verificăm prohibitedTags (trebuie să fim la distanță mai mare de toate obiectele cu aceste tag-uri)
+        if (valid && prohibitedTags != null && prohibitedTags.Length > 0)
+        {
+            foreach (string prohibTag in prohibitedTags)
+            {
+                GameObject[] objs = GameObject.FindGameObjectsWithTag(prohibTag);
+                foreach (GameObject obj in objs)
+                {
+                    float dist = Vector3.Distance(combinedBounds.center, obj.transform.position);
+                    if (dist < prohibitedTagsMinDistance)
+                    {
+                        valid = false;
+                        InvalidReason = $"Prea aproape de un obiect cu tag '{prohibTag}' (distanță minimă: {prohibitedTagsMinDistance}m)!";
+                        break;
+                    }
+                }
+                if (!valid)
+                    break;
             }
         }
 

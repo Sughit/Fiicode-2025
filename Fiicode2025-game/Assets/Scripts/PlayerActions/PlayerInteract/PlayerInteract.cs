@@ -77,7 +77,7 @@ public class PlayerInteract : MonoBehaviour
             Interactable interactable = interactablesBuffer[0].GetComponent<Interactable>();
             if (interactable != null)
             {
-                if (interactable.CompareTag("Ruin") || interactable.CompareTag("Resource"))
+                if (interactable.CompareTag("Ruin") || interactable.CompareTag("Resource") || interactable.CompareTag("Ore"))
                 {
                     interactable.Interact(transform);
                 }

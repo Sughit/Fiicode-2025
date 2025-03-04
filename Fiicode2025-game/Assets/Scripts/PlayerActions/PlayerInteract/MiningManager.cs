@@ -31,8 +31,10 @@ public class MiningManager : MonoBehaviour
 
     private void Awake()
     {
-        if (instance == null) instance = this;
-        else Destroy(this);
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(this);
     }
 
     public void MineResource(Resource resource, Transform player)
@@ -56,7 +58,25 @@ public class MiningManager : MonoBehaviour
             yield break;
         }
 
-        yield return StartCoroutine(MineCoroutine(resource, player));
+        // Loop-ul se repetă atâta timp cât resursa există
+        while (resource != null)
+        {
+            yield return StartCoroutine(MineCoroutine(resource, player));
+
+            // Dacă resursa nu se distruge la final, reia minarea doar dacă jucătorul este încă în raza permisă
+            if (resource != null && !resource.destroyOnMine)
+            {
+                if (Vector3.Distance(player.position, resource.transform.position) > maxMiningDistance)
+                {
+                    Debug.Log("Minare întreruptă: jucătorul s-a îndepărtat prea mult.");
+                    break;
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
 
         isMining = false;
     }
@@ -103,7 +123,8 @@ public class MiningManager : MonoBehaviour
             {
                 Debug.Log("Minare întreruptă: jucătorul s-a îndepărtat prea mult.");
                 Destroy(laser);
-                if (miningParticleEffect != null) Destroy(miningParticleEffect);
+                if (miningParticleEffect != null)
+                    Destroy(miningParticleEffect);
                 yield break;
             }
 
@@ -151,19 +172,15 @@ public class MiningManager : MonoBehaviour
             return;
         }
 
-        // Parcurgem toate drop-urile definite în Resource
         if (resource.resourceDrops != null && resource.resourceDrops.Count > 0)
         {
             foreach (var drop in resource.resourceDrops)
             {
-                // Verificăm probabilitatea
-                float randVal = Random.value; // un număr între 0 și 1
+                float randVal = Random.value;
                 if (randVal <= drop.dropChance)
                 {
                     int amount = Random.Range(drop.minAmount, drop.maxAmount + 1);
-                    // Adăugăm în inventar
                     PlayerInventory.instance.AddItem(drop.itemName, amount);
-
                     Debug.Log($"Added {amount} {drop.itemName} to inventory. (Probability {drop.dropChance})");
                 }
             }

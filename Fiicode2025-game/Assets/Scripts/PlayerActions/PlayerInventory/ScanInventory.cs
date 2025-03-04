@@ -6,6 +6,7 @@ public class ScanInventory : ScriptableObject
     // Resurse naturale
     public bool iron;
     public bool gold;
+    public bool silver;
     public bool coal;
     public bool wood;
     public bool stone;
