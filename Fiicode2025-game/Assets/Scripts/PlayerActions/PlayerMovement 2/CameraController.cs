@@ -6,7 +6,6 @@ public class CameraController : MonoBehaviour
     [Header("Referințe")]
     [Tooltip("Transformul jucătorului")]
     [SerializeField] private Transform player;
-    [SerializeField] private Transform gfx;
     
     [Tooltip("Cinemachine Virtual Camera")]
     [SerializeField] private CinemachineVirtualCamera virtualCamera;

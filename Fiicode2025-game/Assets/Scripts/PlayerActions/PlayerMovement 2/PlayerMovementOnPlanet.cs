@@ -2,8 +2,12 @@ using UnityEngine;
 
 public class PlayerMovementOnPlanet : MonoBehaviour
 {
+    [Header("References")]
     [SerializeField] private Transform planet;
     [SerializeField] private Transform gfx; 
+    [SerializeField] private Transform cameraTransform;  // <--- Asignează camera în Inspector (ex: Camera.main)
+
+    [Header("Movement Settings")]
     [SerializeField] private float gravityStrength = 10f;
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotationSpeed = 10f;
@@ -20,7 +24,7 @@ public class PlayerMovementOnPlanet : MonoBehaviour
         rb.useGravity = false;
         // Asigură-te că, în Inspector, ai:
         // - Rb.interpolation = Interpolate
-        // - Collision detection = Continuous (dacă ai suprafețe neregulate)
+        // - Collision Detection = Continuous (dacă ai suprafețe neregulate)
     }
 
     void Start()
@@ -44,39 +48,41 @@ public class PlayerMovementOnPlanet : MonoBehaviour
 
     private void ApplyGravity()
     {
+        // 1. Atras de planetă
         Vector3 gravityDirection = (planet.position - transform.position).normalized;
         rb.AddForce(gravityDirection * gravityStrength, ForceMode.Acceleration);
 
-        // Rotește corpul jucătorului spre planetă
+        // 2. Orientează "susul" jucătorului contra direcției gravitației
         Quaternion targetRotation = Quaternion.FromToRotation(transform.up, -gravityDirection) * transform.rotation;
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
     }
 
     private void HandleMovement()
     {
-        if (moveInput != Vector2.zero)
+        if (moveInput != Vector2.zero && cameraTransform != null)
         {
-            // Calculăm direcția de deplasare
-            Vector3 moveDirection = (transform.right * moveInput.x + transform.forward * moveInput.y).normalized;
-            Vector3 targetPosition = rb.position + moveDirection * moveSpeed * Time.fixedDeltaTime;
+            // Proiectăm forward și right ale camerei pe planul tangent la planetă (perpendicular pe transform.up)
+            Vector3 cameraForward = Vector3.ProjectOnPlane(cameraTransform.forward, transform.up).normalized;
+            Vector3 cameraRight   = Vector3.ProjectOnPlane(cameraTransform.right, transform.up).normalized;
 
-            // Mișcăm rigidbody-ul
+            // Construiești direcția de mișcare în planul tangent
+            Vector3 moveDirection = (cameraRight * moveInput.x + cameraForward * moveInput.y).normalized;
+
+            Vector3 targetPosition = rb.position + moveDirection * moveSpeed * Time.fixedDeltaTime;
             rb.MovePosition(targetPosition);
 
-            // Salvezi direcția pentru rotația ulterioară
             latestMoveDirection = moveDirection;
         }
         else
         {
-            // Dacă player-ul nu se mișcă, nu vrem să "aruncăm" un moveDirection vechi
+            // Dacă nu există input, nu păstrăm ultimul moveDirection
             latestMoveDirection = Vector3.zero;
         }
     }
 
-    // În LateUpdate, facem rotația graficii la fiecare frame
+    // În LateUpdate rotim doar partea vizuală (gfx) pentru animație / feedback
     void LateUpdate()
     {
-        // Dacă nu ai moveDirection, nu roti gfx
         if (latestMoveDirection != Vector3.zero)
         {
             Quaternion moveRotation = Quaternion.LookRotation(latestMoveDirection, transform.up);

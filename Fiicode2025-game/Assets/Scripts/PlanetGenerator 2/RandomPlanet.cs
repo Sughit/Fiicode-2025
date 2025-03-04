@@ -149,6 +149,87 @@ public class RandomPlanet : MonoBehaviour
 
     public void GenerateColours()
     {
+        // Dacă ai deja logica de randomizare în RandomizeColourSettings(), 
+        // poți fie să o comentezi, fie să o lași doar pentru PlanetType.Random.
+        
+        // Exemplu: dacă tipul este Random, folosim în continuare randomizarea deja existentă
+        // iar pentru Cold, Hot, Perfect definim manual paleta.
+        
+        Gradient customGradient = new Gradient();
+        GradientColorKey[] colorKeys;
+        GradientAlphaKey[] alphaKeys;
+
+        if (planetType == PlanetType.Cold)
+        {
+            // Culori reci: verde, albastru închis, albastru deschis, mov, alb
+            // Putem face un gradient cu 5 "trepte"
+            colorKeys = new GradientColorKey[5];
+            colorKeys[0] = new GradientColorKey(Color.green,        0f);
+            colorKeys[1] = new GradientColorKey(new Color(0f, 0f, 0.5f), 0.25f);   // albastru închis
+            colorKeys[2] = new GradientColorKey(Color.cyan,         0.50f);       // albastru deschis
+            colorKeys[3] = new GradientColorKey(new Color(0.5f, 0f, 0.5f), 0.75f); // mov
+            colorKeys[4] = new GradientColorKey(Color.white,        1f);
+
+            alphaKeys = new GradientAlphaKey[5];
+            for (int i = 0; i < 5; i++)
+            {
+                alphaKeys[i] = new GradientAlphaKey(1f, colorKeys[i].time);
+            }
+
+            customGradient.SetKeys(colorKeys, alphaKeys);
+            colourSettings.gradient = customGradient;
+        }
+        else if (planetType == PlanetType.Hot)
+        {
+            // Culori calde: galben, roșu, portocaliu, mov deschis
+            colorKeys = new GradientColorKey[4];
+            colorKeys[0] = new GradientColorKey(Color.yellow,                0f);
+            colorKeys[1] = new GradientColorKey(Color.red,                   0.33f);
+            colorKeys[2] = new GradientColorKey(new Color(1f, 0.5f, 0f),     0.66f); // portocaliu
+            colorKeys[3] = new GradientColorKey(new Color(1f, 0.5f, 1f),     1f);    // mov deschis
+
+            alphaKeys = new GradientAlphaKey[4];
+            for (int i = 0; i < 4; i++)
+            {
+                alphaKeys[i] = new GradientAlphaKey(1f, colorKeys[i].time);
+            }
+
+            customGradient.SetKeys(colorKeys, alphaKeys);
+            colourSettings.gradient = customGradient;
+        }
+        else if (planetType == PlanetType.Perfect)
+        {
+            // Paletă de culori similară cu Pământul:
+            // albastru (apa), verde (câmpii), maro (munți), alb (vârf)
+            colorKeys = new GradientColorKey[4];
+            colorKeys[0] = new GradientColorKey(Color.blue,    0f);   // apă
+            colorKeys[1] = new GradientColorKey(Color.green,   0.5f); // câmpii
+            colorKeys[2] = new GradientColorKey(new Color(0.5f, 0.25f, 0f), 0.75f); // maro munți
+            colorKeys[3] = new GradientColorKey(Color.white,   1f);   // vârf de munte
+
+            alphaKeys = new GradientAlphaKey[4];
+            for (int i = 0; i < 4; i++)
+            {
+                alphaKeys[i] = new GradientAlphaKey(1f, colorKeys[i].time);
+            }
+
+            customGradient.SetKeys(colorKeys, alphaKeys);
+            colourSettings.gradient = customGradient;
+        }
+        else
+        {
+            // Dacă e "Random" sau alt tip, putem să folosim logica 
+            // deja existentă de randomizare (RandomizeColourSettings).
+            // Presupunând că acolo setăm deja colourSettings.gradient:
+            RandomizeColourSettings();
+        }
+
+        // Eventual, ajustezi culoarea spumei (_FoamColor) în funcție de gradientul final
+        Color darkestGradientColor = FindDarkestColorInGradient(colourSettings.gradient);
+        Color finalFoamColor = EnsureDarkerThan(userFoamColor, darkestGradientColor);
+        colourSettings.planetMaterial.SetColor("_FoamColor", finalFoamColor);
+
+        // Actualizezi materialul cu gradientul final
         colourGenerator.UpdateColours();
     }
 
