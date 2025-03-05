@@ -123,5 +123,10 @@ public class CanvasManager : MonoBehaviour
         stoneProcessingMenu.SetActive(false);
         depotMenu.SetActive(false);
     }
+
+    public void CollectResourcesFromMine(string resourceName, int resourceAmount)
+    {
+        PlayerInventory.instance.AddItem(resourceName, resourceAmount);
+    }
     #endregion
 }

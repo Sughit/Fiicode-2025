@@ -7,4 +7,9 @@ public class Storage : Building
         //OBLIGATORIU
         base.Interact();
     }
+
+    void Start()
+    {
+        base.Start();
+    }
 }

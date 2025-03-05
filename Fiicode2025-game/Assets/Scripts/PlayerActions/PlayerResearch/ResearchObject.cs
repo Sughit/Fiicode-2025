@@ -43,6 +43,17 @@ public class ResearchObject
             tooltipPanel.SetActive(false);
     }
 
+    void Start()
+    {
+        if(CheckIfAlreadyUnlocked())
+        {
+            foreach(GameObject building in unlockBuildings)
+            {
+                building.SetActive(true);
+            }
+        }
+    }
+
     // ---------------------------------------------------------------------------------------
     // Logica de research
     // ---------------------------------------------------------------------------------------

@@ -29,8 +29,13 @@ public class Weapon : Building
 
     public override void Interact()
     {
-        // OBLIGATORIU: logica din clasa părinte (Building)
+        // OBLIGATORIU
         base.Interact();
+    }
+
+    void Start()
+    {
+        base.Start();
     }
 
     private void Update()

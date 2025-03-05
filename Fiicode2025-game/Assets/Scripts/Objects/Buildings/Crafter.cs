@@ -7,4 +7,9 @@ public class Crafter : Building
         //OBLIGATORIU
         base.Interact();
     }
+
+    void Start()
+    {
+        base.Start();
+    }
 }

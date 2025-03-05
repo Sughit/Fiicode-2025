@@ -89,6 +89,8 @@ public class PlayerScanInventory : MonoBehaviour
             string json = PlayerPrefs.GetString(SaveKey);
             JsonUtility.FromJsonOverwrite(json, inventory);
             Debug.Log("ScanInventory loaded: " + json);
+
+            ResearchTree.instance.CheckAll();
         }
         else
         {

@@ -7,4 +7,9 @@ public class House : Building
         //OBLIGATORIU
         base.Interact();
     }
+
+    void Start()
+    {
+        base.Start();
+    }
 }

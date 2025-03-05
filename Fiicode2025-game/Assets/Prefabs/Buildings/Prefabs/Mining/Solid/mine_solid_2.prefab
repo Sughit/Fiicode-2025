@@ -146,3 +146,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buildingType: 0
   buildingName: Mine 2
+  miningInterval: 2
+  miningRange: 1
+  maxInventoryCapacity: 300

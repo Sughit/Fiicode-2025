@@ -9,7 +9,7 @@ public class Building : Interactable
 
     private CinemachineVirtualCamera interactionCamera;
 
-    void Start()
+    protected virtual void Start()
     {
         if (PlayerController.instance != null)
         {

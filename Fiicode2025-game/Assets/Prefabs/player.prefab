@@ -10495,6 +10495,7 @@ GameObject:
   - component: {fileID: 6552304520868179270}
   - component: {fileID: 8755722994736918031}
   - component: {fileID: 3239688052147279195}
+  - component: {fileID: 6973030309937475900}
   m_Layer: 5
   m_Name: MainCanvas
   m_TagString: Untagged
@@ -10636,6 +10637,51 @@ MonoBehaviour:
   notificationBg: {fileID: 2363949639098387470}
   notificationAnim: {fileID: 7087262669039593568}
   notificationDuration: 2
+--- !u!114 &6973030309937475900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5013699087695630381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17b509e08d2172e408722f64b5d9ab1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildings:
+  - buildingName: sMine1
+    buildingButton: {fileID: 8268763273241629712}
+  - buildingName: sMine2
+    buildingButton: {fileID: 3332109797949906125}
+  - buildingName: fMine1
+    buildingButton: {fileID: 5669150934602953688}
+  - buildingName: greenHouse
+    buildingButton: {fileID: 5030813346491732066}
+  - buildingName: sStorage1
+    buildingButton: {fileID: 8888107987083636387}
+  - buildingName: sStorage2
+    buildingButton: {fileID: 2919673493226279379}
+  - buildingName: sStorage3
+    buildingButton: {fileID: 8901055053959596676}
+  - buildingName: sStorage4
+    buildingButton: {fileID: 1658465028572492879}
+  - buildingName: fStorage1
+    buildingButton: {fileID: 4695314391096657959}
+  - buildingName: fStorage2
+    buildingButton: {fileID: 3351305247752621926}
+  - buildingName: weapon1
+    buildingButton: {fileID: 2163956835339116335}
+  - buildingName: weapon2
+    buildingButton: {fileID: 1160684636157400841}
+  - buildingName: comm1
+    buildingButton: {fileID: 7474119658838871234}
+  - buildingName: comm2
+    buildingButton: {fileID: 2550652310239997278}
+  - buildingName: comm3
+    buildingButton: {fileID: 664402226031631653}
+  - buildingName: comm4
+    buildingButton: {fileID: 1386344729100163525}
 --- !u!1 &5030813346491732066
 GameObject:
   m_ObjectHideFlags: 0
