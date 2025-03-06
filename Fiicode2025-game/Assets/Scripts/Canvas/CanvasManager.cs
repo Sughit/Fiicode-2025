@@ -12,12 +12,12 @@ public class CanvasManager : MonoBehaviour
     // Meniuri separate pentru fiecare tip de clădire
     [Header("Building UI")]
     [SerializeField] private GameObject mineMenu;
-    [SerializeField] private GameObject houseMenu;
-    [SerializeField] private GameObject foodSourceMenu;
+    [SerializeField] private GameObject plantMenu;
+    [SerializeField] private GameObject foodMenu;
+    [SerializeField] private GameObject metalMenu;
+    [SerializeField] private GameObject miscMenu;
+    [SerializeField] private GameObject lifeMenu;
     [SerializeField] private GameObject weaponMenu;
-    [SerializeField] private GameObject metalProcessingMenu;
-    [SerializeField] private GameObject woodProcessingMenu;
-    [SerializeField] private GameObject stoneProcessingMenu;
     [SerializeField] private GameObject depotMenu;
 
     // Un text in care afișăm numele clădirii selectate (opțional)
@@ -26,6 +26,10 @@ public class CanvasManager : MonoBehaviour
 
     [Header("Mining Icons")]
     [SerializeField] private Image miningIcon;
+
+    [Header("Crafting Icons")]
+    [SerializeField] private Image craftingInputIcon;
+    [SerializeField] private Image craftingOutputIcon;
 
     private GameObject interactionGO;
 
@@ -81,23 +85,23 @@ public class CanvasManager : MonoBehaviour
             case BuildingType.Mine:
                 mineMenu.SetActive(true);
                 break;
-            case BuildingType.House:
-                houseMenu.SetActive(true);
+            case BuildingType.PlantCrafting:
+                plantMenu.SetActive(true);
                 break;
-            case BuildingType.FoodSource:
-                foodSourceMenu.SetActive(true);
+            case BuildingType.FoodCrafting:
+                foodMenu.SetActive(true);
                 break;
             case BuildingType.Weapon:
                 weaponMenu.SetActive(true);
                 break;
-            case BuildingType.MetalProcessing:
-                metalProcessingMenu.SetActive(true);
+            case BuildingType.MetalCrafting:
+                metalMenu.SetActive(true);
                 break;
-            case BuildingType.WoodProcessing:
-                woodProcessingMenu.SetActive(true);
+            case BuildingType.MiscCrafting:
+                miscMenu.SetActive(true);
                 break;
-            case BuildingType.StoneProcessing:
-                stoneProcessingMenu.SetActive(true);
+            case BuildingType.LifeCrafting:
+                lifeMenu.SetActive(true);
                 break;
             case BuildingType.Depot:
                 depotMenu.SetActive(true);
@@ -120,23 +124,18 @@ public class CanvasManager : MonoBehaviour
     private void CloseAllBuildingMenus()
     {
         mineMenu.SetActive(false);
-        houseMenu.SetActive(false);
-        foodSourceMenu.SetActive(false);
+        plantMenu.SetActive(false);
+        foodMenu.SetActive(false);
         weaponMenu.SetActive(false);
-        metalProcessingMenu.SetActive(false);
-        woodProcessingMenu.SetActive(false);
-        stoneProcessingMenu.SetActive(false);
+        metalMenu.SetActive(false);
+        miscMenu.SetActive(false);
+        lifeMenu.SetActive(false);
         depotMenu.SetActive(false);
     }
 
     public void SetInteractionGO(GameObject go)
     {
         interactionGO = go;
-    }
-
-    public void SetMiningIcons(Sprite icon)
-    {
-        miningIcon.sprite = icon; 
     }
 
     public void CollectResourcesFromMine()
@@ -148,4 +147,24 @@ public class CanvasManager : MonoBehaviour
         else return;
     }
     #endregion
+
+    #region Icons
+    public void SetMiningIcons(Sprite icon)
+    {
+        if(miningIcon != null)
+        {
+            miningIcon.sprite = icon;
+        } 
+    }
+
+    public void SetCraftingIcons(Sprite iconInput, Sprite iconOutput)
+    {
+        if(craftingInputIcon != null && craftingOutputIcon != null)
+        {
+            craftingInputIcon.sprite = iconInput;
+            craftingOutputIcon.sprite = iconOutput;
+        }
+    }
+    #endregion
+
 }

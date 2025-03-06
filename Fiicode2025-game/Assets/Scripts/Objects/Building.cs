@@ -58,4 +58,9 @@ public class Building : Interactable
     {
         CanvasManager.instance.SetMiningIcons(icon);
     }
+
+    public void SetCraftingIcons(Sprite iconInput, Sprite iconOutput)
+    {
+        CanvasManager.instance.SetCraftingIcons(iconInput, iconOutput);
+    }
 }

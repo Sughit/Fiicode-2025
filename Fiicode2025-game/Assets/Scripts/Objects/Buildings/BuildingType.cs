@@ -1,11 +1,11 @@
 public enum BuildingType
 {
     Mine,
-    House,
-    FoodSource,
+    PlantCrafting,
+    FoodCrafting,
+    MetalCrafting,
+    MiscCrafting,
+    LifeCrafting,
     Weapon,
-    MetalProcessing,
-    WoodProcessing,
-    StoneProcessing,
     Depot
 }
