@@ -147,6 +147,7 @@ MonoBehaviour:
     minAmount: 10
     maxAmount: 20
     dropChance: 1
+  type: 2
   scanningObj: {fileID: 9016556023267311019}
   requiredDiscovery: coal
 --- !u!1 &9016556023267311019

@@ -27,6 +27,7 @@ public class Resource : Interactable
     // -----------------
     [Tooltip("Lista de iteme care pot fi obținute la minarea acestei resurse, cu probabilități individuale.")]
     public List<ResourceDrop> resourceDrops;
+    public ResourceType type;
     [SerializeField] private GameObject scanningObj;
     [SerializeField] private string requiredDiscovery;
 

@@ -147,6 +147,7 @@ MonoBehaviour:
     minAmount: 10
     maxAmount: 20
     dropChance: 1
+  type: 5
   scanningObj: {fileID: 7861467964465081629}
   requiredDiscovery: silver
 --- !u!1 &7861467964465081629

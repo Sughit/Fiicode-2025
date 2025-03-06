@@ -233,5 +233,6 @@ MonoBehaviour:
     minAmount: 10
     maxAmount: 20
     dropChance: 1
+  type: 4
   scanningObj: {fileID: 389125117470175018}
   requiredDiscovery: gold

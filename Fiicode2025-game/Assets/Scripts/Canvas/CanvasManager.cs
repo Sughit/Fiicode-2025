@@ -24,6 +24,11 @@ public class CanvasManager : MonoBehaviour
     [SerializeField] private Text buildingNameText;
     [SerializeField] private GameObject buildingMenu;
 
+    [Header("Mining Icons")]
+    [SerializeField] private Image miningIcon;
+
+    private GameObject interactionGO;
+
     public static CanvasManager instance;
 
     void Awake()
@@ -124,9 +129,23 @@ public class CanvasManager : MonoBehaviour
         depotMenu.SetActive(false);
     }
 
-    public void CollectResourcesFromMine(string resourceName, int resourceAmount)
+    public void SetInteractionGO(GameObject go)
     {
-        PlayerInventory.instance.AddItem(resourceName, resourceAmount);
+        interactionGO = go;
+    }
+
+    public void SetMiningIcons(Sprite icon)
+    {
+        miningIcon.sprite = icon; 
+    }
+
+    public void CollectResourcesFromMine()
+    {
+        if(interactionGO != null)
+        {
+            interactionGO.GetComponent<Miner>().CollectResources();
+        }
+        else return;
     }
     #endregion
 }

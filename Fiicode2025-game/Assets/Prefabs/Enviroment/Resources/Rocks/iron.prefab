@@ -233,5 +233,6 @@ MonoBehaviour:
     minAmount: 10
     maxAmount: 20
     dropChance: 1
+  type: 3
   scanningObj: {fileID: 1731363578699951635}
   requiredDiscovery: iron

@@ -147,6 +147,7 @@ MonoBehaviour:
     minAmount: 20
     maxAmount: 35
     dropChance: 1
+  type: 1
   scanningObj: {fileID: 6878741219467419102}
   requiredDiscovery: stone
 --- !u!1 &6878741219467419102

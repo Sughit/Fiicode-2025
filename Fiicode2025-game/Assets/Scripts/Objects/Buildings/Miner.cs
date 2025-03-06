@@ -1,10 +1,11 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
-public class Miners : Building
+public class Miner : Building
 {
-    [Header("Parametri Miner")]
+    [Header("Parameters")]
     [Tooltip("Intervalul de timp (secunde) între acțiunile de minare.")]
     public float miningInterval = 2f;
     [Tooltip("Raza în care se caută resurse.")]
@@ -13,8 +14,9 @@ public class Miners : Building
     public int maxInventoryCapacity = 100;
     [Tooltip("Numele resursei ce va fi adăugată în inventarul playerului. (Opțional: dacă nu e setat, se va folosi numele primului drop al resursei țintă)")]
     public string resourceItemName;
+    public Sprite icon;
 
-    private int currentInventoryCount = 0; // numărul curent de iteme în inventar
+    public int currentInventoryCount = 0; // numărul curent de iteme în inventar
     private Resource targetResource;        // resursa țintă pe care o minăm
     private Coroutine miningCoroutine;      // referință la rutina de minare
 
@@ -27,16 +29,25 @@ public class Miners : Building
             Debug.LogWarning("Nu s-a găsit nicio resursă în raza de căutare.");
         }
         miningCoroutine = StartCoroutine(MiningRoutine());
+        icon = IconManager.instance.GetResourceIcon(targetResource.type.ToString());
     }
 
     public override void Interact()
     {
         // OBLIGATORIU
         base.Interact();
+        SetMiningIcons(icon);
         if (miningCoroutine == null)
         {
             miningCoroutine = StartCoroutine(MiningRoutine());
         }
+    }
+
+    public override void EndInteraction()
+    {
+        // OBLIGATORIU
+        base.EndInteraction();
+        SetMiningIcons(null);
     }
 
     // Rutină care la fiecare interval minează resursa găsită, dacă inventarul nu e plin
@@ -128,7 +139,7 @@ public class Miners : Building
             }
         }
 
-        CanvasManager.instance.CollectResourcesFromMine(itemNameToAdd, currentInventoryCount);
+        PlayerInventory.instance.AddItem(itemNameToAdd, currentInventoryCount);
 
         Debug.Log("S-au colectat " + currentInventoryCount + " " + itemNameToAdd + " din mina în inventarul playerului.");
 

@@ -147,6 +147,7 @@ MonoBehaviour:
     minAmount: 10
     maxAmount: 20
     dropChance: 1
+  type: 6
   scanningObj: {fileID: 5279303048934482635}
   requiredDiscovery: copper
 --- !u!1 &5279303048934482635

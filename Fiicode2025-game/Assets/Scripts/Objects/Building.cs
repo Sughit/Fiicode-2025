@@ -1,5 +1,6 @@
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.UI;
 
 public class Building : Interactable
 {
@@ -30,9 +31,13 @@ public class Building : Interactable
 
         // Apelează CanvasManager pentru a deschide meniul corespunzător acestei clădiri
         CanvasManager.instance.OpenBuildingUI(buildingType, buildingName);
+        CanvasManager.instance.SetInteractionGO(this.gameObject);
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 
-    public void EndInteraction()
+    public virtual void EndInteraction()
     {
         if (interactionCamera != null)
         {
@@ -43,5 +48,14 @@ public class Building : Interactable
 
         // Închide meniul clădirii curente
         CanvasManager.instance.CloseBuildingUI();
+        CanvasManager.instance.SetInteractionGO(null);
+
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    public void SetMiningIcons(Sprite icon)
+    {
+        CanvasManager.instance.SetMiningIcons(icon);
     }
 }
