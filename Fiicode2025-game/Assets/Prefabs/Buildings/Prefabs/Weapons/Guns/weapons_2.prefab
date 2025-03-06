@@ -241,7 +241,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c842d6b30c5a9a64d94167abbaec383a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buildingType: 3
+  buildingType: 6
   buildingName: Weapon 2
   projectilePrefab: {fileID: 0}
   firePoints:

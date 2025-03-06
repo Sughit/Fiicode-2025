@@ -144,5 +144,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49c4fb05c692975468cc94b010f1591e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buildingType: 2
+  buildingType: 1
   buildingName: Green House
+  plantCraftingList: []
+  foodCraftingList: []
+  metalCraftingList: []
+  miscCraftingList: []
+  lifeCraftingList: []
+  iconInput: {fileID: 0}
+  iconOutput: {fileID: 0}
