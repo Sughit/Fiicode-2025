@@ -27,7 +27,7 @@ public class PlanetInSpace : MonoBehaviour
         }
     }
 
-    // Cursorul intră pe collider
+    // Când cursorul intră pe collider
     void OnMouseEnter()
     {
         Debug.Log(gameObject.name);
@@ -37,27 +37,21 @@ public class PlanetInSpace : MonoBehaviour
             string info = "Name: " + gameObject.name + "\n";
             if (isStartingPlanet)
             {
-                // Planeta de început
+                // Planeta de început (presupunem tip Perfect și mărime Medium)
                 info += "Type: Perfect\n";
                 info += "Size: Medium";
             }
             else if (randomPlanet != null)
             {
-                // Determină dimensiunea în funcție de radius
+                // Determină dimensiunea în funcție de raza generată
                 float radius = randomPlanet.shapeSettings.planetRadius;
                 string sizeCategory = "";
-                if (randomPlanet.useMainMenuPlanetSizes)
-                {
-                    if (radius < 5.5f) sizeCategory = "Small";
-                    else if (radius < 7f) sizeCategory = "Medium";
-                    else sizeCategory = "Large";
-                }
+                if (radius < 20f)
+                    sizeCategory = "Small";
+                else if (radius < 25f)
+                    sizeCategory = "Medium";
                 else
-                {
-                    if (radius < 20f) sizeCategory = "Small";
-                    else if (radius < 25f) sizeCategory = "Medium";
-                    else sizeCategory = "Large";
-                }
+                    sizeCategory = "Large";
 
                 info += "Type: " + randomPlanet.planetType.ToString() + "\n";
                 info += "Size: " + sizeCategory;
@@ -69,7 +63,7 @@ public class PlanetInSpace : MonoBehaviour
         mouseOver = true;
     }
 
-    // Cursorul iese de pe collider
+    // Când cursorul iese de pe collider
     void OnMouseExit()
     {
         if (overlayText != null && infoMenu != null)
@@ -80,10 +74,10 @@ public class PlanetInSpace : MonoBehaviour
         mouseOver = false;
     }
 
-    // Când dai clic pe collider
+    // La clic pe planetă
     void OnMouseDown()
     {
-        // Încarcă scena specificată dacă e setată
+        // Încarcă scena specificată dacă este setată și cursorul este peste planetă
         if (!string.IsNullOrEmpty(sceneToLoadOnClick) && mouseOver)
         {
             SceneManager.LoadScene(sceneToLoadOnClick);

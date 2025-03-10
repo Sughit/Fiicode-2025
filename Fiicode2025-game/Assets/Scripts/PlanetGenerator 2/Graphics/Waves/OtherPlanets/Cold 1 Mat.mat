@@ -33,7 +33,7 @@ Material:
     - _FoamThreshold: 0.05
     - _MaxHeight: 1
     - _MinHeight: -0.2
-    - _PlanetRadius: 21.828392
+    - _PlanetRadius: 22.185307
     - _WaterHeight: 0
     - _WaveScale: 2
     - _WaveSpeed: 1

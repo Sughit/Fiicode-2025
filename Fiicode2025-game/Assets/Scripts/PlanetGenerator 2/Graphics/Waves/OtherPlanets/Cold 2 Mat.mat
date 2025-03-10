@@ -31,9 +31,9 @@ Material:
     m_Floats:
     - _FoamStrength: 0.5
     - _FoamThreshold: 0.05
-    - _MaxHeight: 1
+    - _MaxHeight: 54.79
     - _MinHeight: -0.2
-    - _PlanetRadius: 28.537842
+    - _PlanetRadius: 28.539038
     - _WaterHeight: 0
     - _WaveScale: 2
     - _WaveSpeed: 1

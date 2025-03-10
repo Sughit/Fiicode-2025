@@ -15,5 +15,10 @@ public class PlayerTogglePlanetSpace : MonoBehaviour
     void TogglePlanetSpace()
     {
         SceneManager.LoadScene("Space");
+
+        onPlanet = !onPlanet;
+
+        Cursor.visible = !onPlanet;
+        Cursor.lockState = onPlanet ? CursorLockMode.None : CursorLockMode.Locked;
     }
 }

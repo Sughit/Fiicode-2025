@@ -60,6 +60,13 @@ public class Spawner : MonoBehaviour
 
     public void SpawnObjects(ShapeGenerator shapeGenerator)
     {
+        // Dacă planeta folosește seed, reinitializează starea random cu seed-ul actual
+        RandomPlanet rp = GetComponent<RandomPlanet>();
+        if (rp != null && rp.useSeed)
+        {
+            Random.InitState(rp.currentSeed);
+        }
+
         MeshRenderer renderer = GetPlanetMeshRenderer();
         if (renderer == null || renderer.sharedMaterial == null)
         {
