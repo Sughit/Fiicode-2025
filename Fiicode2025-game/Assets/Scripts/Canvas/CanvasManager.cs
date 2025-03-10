@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;       // Sau foloseste TMPro, in functie de ce ai in UI
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public class CanvasManager : MonoBehaviour
 {
@@ -12,11 +13,7 @@ public class CanvasManager : MonoBehaviour
     // Meniuri separate pentru fiecare tip de clădire
     [Header("Building UI")]
     [SerializeField] private GameObject mineMenu;
-    [SerializeField] private GameObject plantMenu;
-    [SerializeField] private GameObject foodMenu;
-    [SerializeField] private GameObject metalMenu;
-    [SerializeField] private GameObject miscMenu;
-    [SerializeField] private GameObject lifeMenu;
+    [SerializeField] private GameObject craftingMenu;
     [SerializeField] private GameObject weaponMenu;
     [SerializeField] private GameObject depotMenu;
 
@@ -27,9 +24,10 @@ public class CanvasManager : MonoBehaviour
     [Header("Mining Icons")]
     [SerializeField] private Image miningIcon;
 
-    [Header("Crafting Icons")]
-    [SerializeField] private Image craftingInputIcon;
-    [SerializeField] private Image craftingOutputIcon;
+    [Header("Crafting Info")]
+    [SerializeField] private Image craftingIcon;
+    [SerializeField] private CraftingInfoSO currentRecipe;
+    [SerializeField] private Dropdown craftingDropdown;
 
     private GameObject interactionGO;
 
@@ -86,22 +84,22 @@ public class CanvasManager : MonoBehaviour
                 mineMenu.SetActive(true);
                 break;
             case BuildingType.PlantCrafting:
-                plantMenu.SetActive(true);
+                craftingMenu.SetActive(true);
                 break;
             case BuildingType.FoodCrafting:
-                foodMenu.SetActive(true);
+                craftingMenu.SetActive(true);
                 break;
             case BuildingType.Weapon:
                 weaponMenu.SetActive(true);
                 break;
             case BuildingType.MetalCrafting:
-                metalMenu.SetActive(true);
+                craftingMenu.SetActive(true);
                 break;
             case BuildingType.MiscCrafting:
-                miscMenu.SetActive(true);
+                craftingMenu.SetActive(true);
                 break;
             case BuildingType.LifeCrafting:
-                lifeMenu.SetActive(true);
+                craftingMenu.SetActive(true);
                 break;
             case BuildingType.Depot:
                 depotMenu.SetActive(true);
@@ -124,12 +122,8 @@ public class CanvasManager : MonoBehaviour
     private void CloseAllBuildingMenus()
     {
         mineMenu.SetActive(false);
-        plantMenu.SetActive(false);
-        foodMenu.SetActive(false);
+        craftingMenu.SetActive(false);
         weaponMenu.SetActive(false);
-        metalMenu.SetActive(false);
-        miscMenu.SetActive(false);
-        lifeMenu.SetActive(false);
         depotMenu.SetActive(false);
     }
 
@@ -146,8 +140,56 @@ public class CanvasManager : MonoBehaviour
         }
         else return;
     }
+
+    public void MakeItemFromCrafter()
+    {
+        if(interactionGO != null)
+        {
+            interactionGO.GetComponent<Crafter>().MakeItem(currentRecipe.inputs, currentRecipe.outputName, currentRecipe.outputAmount);
+        }
+        else return;
+    }
     #endregion
 
+    #region Crafting Dropdown Management
+
+    // Populează dropdown-ul cu opțiuni și cu referințele la CraftingInfoSO
+    public void SetupCrafterDropdown(List<string> options, List<CraftingInfoSO> recipes)
+    {
+        if(craftingDropdown == null) return;
+        craftingDropdown.ClearOptions();
+        craftingDropdown.AddOptions(options);
+        // Eliminăm eventualii listener anteriori
+        craftingDropdown.onValueChanged.RemoveAllListeners();
+        // Adăugăm listener-ul care actualizează iconița din CraftingInfoSO
+        craftingDropdown.onValueChanged.AddListener((index) =>
+        {
+            if(index < recipes.Count)
+            {
+                SetCraftingIcons(recipes[index].outputIcon);
+                currentRecipe = recipes[index];
+            }
+        });
+        // Setăm iconița inițială, dacă există opțiuni și referințe
+        if(options.Count > 0 && recipes.Count > 0)
+        {
+            SetCraftingIcons(recipes[craftingDropdown.value].outputIcon);
+            currentRecipe = recipes[craftingDropdown.value];
+        }
+    }
+
+    // Curăță dropdown-ul la finalul interacțiunii
+    public void ClearCraftingDropdown()
+    {
+        if(craftingDropdown != null)
+        {
+            craftingDropdown.onValueChanged.RemoveAllListeners();
+            craftingDropdown.ClearOptions();
+        }
+    }
+
+    #endregion
+    
     #region Icons
     public void SetMiningIcons(Sprite icon)
     {
@@ -157,12 +199,11 @@ public class CanvasManager : MonoBehaviour
         } 
     }
 
-    public void SetCraftingIcons(Sprite iconInput, Sprite iconOutput)
+    public void SetCraftingIcons(Sprite icon)
     {
-        if(craftingInputIcon != null && craftingOutputIcon != null)
+        if(craftingIcon != null)
         {
-            craftingInputIcon.sprite = iconInput;
-            craftingOutputIcon.sprite = iconOutput;
+            craftingIcon.sprite = icon;
         }
     }
     #endregion

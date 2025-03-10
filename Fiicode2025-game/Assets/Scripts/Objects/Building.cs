@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class Building : Interactable
 {
     [Header("Building Info")]
-    [SerializeField] private BuildingType buildingType;
+    public BuildingType buildingType;
     [SerializeField] private string buildingName = "Default Building Name";
 
     private CinemachineVirtualCamera interactionCamera;
@@ -52,15 +52,5 @@ public class Building : Interactable
 
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-    }
-
-    public void SetMiningIcons(Sprite icon)
-    {
-        CanvasManager.instance.SetMiningIcons(icon);
-    }
-
-    public void SetCraftingIcons(Sprite iconInput, Sprite iconOutput)
-    {
-        CanvasManager.instance.SetCraftingIcons(iconInput, iconOutput);
     }
 }

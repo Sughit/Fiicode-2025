@@ -36,7 +36,7 @@ public class Miner : Building
     {
         // OBLIGATORIU
         base.Interact();
-        SetMiningIcons(icon);
+        CanvasManager.instance.SetMiningIcons(icon);
         if (miningCoroutine == null)
         {
             miningCoroutine = StartCoroutine(MiningRoutine());
@@ -47,7 +47,7 @@ public class Miner : Building
     {
         // OBLIGATORIU
         base.EndInteraction();
-        SetMiningIcons(null);
+        CanvasManager.instance.SetMiningIcons(null);
     }
 
     // Rutină care la fiecare interval minează resursa găsită, dacă inventarul nu e plin

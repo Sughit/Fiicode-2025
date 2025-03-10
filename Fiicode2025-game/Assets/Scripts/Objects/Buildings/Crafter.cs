@@ -4,39 +4,48 @@ using System.Collections.Generic;
 
 public class Crafter : Building
 {
-    public enum CrafterType
-    {
-        PlantCrafting,
-        FoodCrafting,
-        MetalCrafting,
-        MiscCrafting,
-        LifeCrafting
-    }
-
     [Header("Crafting lists")]
-    [SerializeField] private List<string> plantCraftingList;
-    [SerializeField] private List<string> foodCraftingList;
-    [SerializeField] private List<string> metalCraftingList;
-    [SerializeField] private List<string> miscCraftingList;
-    [SerializeField] private List<string> lifeCraftingList;
-    public Sprite iconInput, iconOutput;
+    [SerializeField] private List<string> options;
+    [SerializeField] private List<CraftingInfoSO> craftingRecipes;
 
     public override void Interact()
     {
-        //OBLIGATORIU
+        // OBIGATORIU: apelează metoda de bază
         base.Interact();
-        SetCraftingIcons(iconInput, iconOutput);
+        // Populează dropdown-ul din CanvasManager cu opțiuni și referințe la CraftingInfoSO
+        CanvasManager.instance.SetupCrafterDropdown(options, craftingRecipes);
     }
 
     public override void EndInteraction()
     {
-        //OBLIGATORIU
         base.EndInteraction();
-        SetCraftingIcons(null, null);
+        CanvasManager.instance.SetCraftingIcons(null);
+        CanvasManager.instance.ClearCraftingDropdown();
     }
 
     void Start()
     {
         base.Start();
+    }
+
+    public void MakeItem(Ingredient[] inputs, string outputName, int outputAmount)
+    {
+        foreach(Ingredient input in inputs)
+        {
+            if(!PlayerInventory.instance.CanRemoveItem(input.name, input.ammount))
+            {
+                Debug.Log("Missing ingredient: " + input.name);
+                return;
+            }
+        }
+
+        foreach(Ingredient input in inputs)
+        {
+            PlayerInventory.instance.RemoveItem(input.name, input.ammount);
+        }
+
+        PlayerInventory.instance.AddItem(outputName, outputAmount);
+        NotificationManager.instance.ShowNotification($"Added {outputAmount} {outputName} to inventory.");
+        Debug.Log("Crafted: " + outputName);
     }
 }

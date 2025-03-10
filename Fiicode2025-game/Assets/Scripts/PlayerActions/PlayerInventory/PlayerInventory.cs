@@ -25,7 +25,7 @@ public class PlayerInventory : MonoBehaviour
             return;
         }
 
-        if (ModifyVariable(inventory, itemName, amount))
+        if (ModifyVariable(itemName, amount))
         {
             Debug.Log($"Added {amount} {itemName} to inventory.");
             NotificationManager.instance.ShowNotification($"Added {amount} {itemName} to inventory.");
@@ -45,9 +45,9 @@ public class PlayerInventory : MonoBehaviour
             return;
         }
 
-        if (CanRemoveItem(inventory, itemName, amount))
+        if (CanRemoveItem(itemName, amount))
         {
-            if (ModifyVariable(inventory, itemName, -amount))
+            if (ModifyVariable(itemName, -amount))
             {
                 Debug.Log($"Removed {amount} {itemName} from inventory.");
                 SaveInventory(); // Save after removing
@@ -59,8 +59,13 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
-    private bool ModifyVariable(ScriptableObject scriptableObject, string variableName, int amount)
+    private bool ModifyVariable(string variableName, int amount, ScriptableObject scriptableObject = null)
     {
+        if(scriptableObject == null)
+        {
+            scriptableObject = inventory;
+        }
+
         System.Type type = scriptableObject.GetType();
         FieldInfo field = type.GetField(variableName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -75,8 +80,13 @@ public class PlayerInventory : MonoBehaviour
         return false;
     }
 
-    private bool CanRemoveItem(ScriptableObject scriptableObject, string variableName, int amount)
+    public bool CanRemoveItem(string variableName, int amount, ScriptableObject scriptableObject = null)
     {
+        if(scriptableObject == null)
+        {
+            scriptableObject = inventory;
+        }
+
         System.Type type = scriptableObject.GetType();
         FieldInfo field = type.GetField(variableName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 

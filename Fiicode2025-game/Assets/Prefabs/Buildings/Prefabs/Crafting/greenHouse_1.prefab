@@ -146,10 +146,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buildingType: 1
   buildingName: Green House
-  plantCraftingList: []
-  foodCraftingList: []
-  metalCraftingList: []
-  miscCraftingList: []
-  lifeCraftingList: []
-  iconInput: {fileID: 0}
-  iconOutput: {fileID: 0}
+  options:
+  - Vegetables
+  - Fruits
+  - Wood
+  craftingRecipes:
+  - {fileID: 11400000, guid: b3413c5b25c340c44bf47d136390bca2, type: 2}
+  - {fileID: 11400000, guid: f0bf83cf1456fec4d949a2a348cc0cfd, type: 2}
+  - {fileID: 11400000, guid: bf2b89f8bd372da4f8a609ff7d773220, type: 2}

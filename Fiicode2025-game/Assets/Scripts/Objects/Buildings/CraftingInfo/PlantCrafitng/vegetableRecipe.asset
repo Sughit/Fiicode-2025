@@ -9,18 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eedcdd1e18d95154ea9ce8d53de6c4b1, type: 3}
-  m_Name: PlayerInventory
+  m_Script: {fileID: 11500000, guid: eae6169726fafa440986d62541619a11, type: 3}
+  m_Name: vegetableRecipe
   m_EditorClassIdentifier: 
-  wood: 561
-  stone: 0
-  iron: 0
-  gold: 0
-  silver: 49
-  coal: 0
-  clay: 0
-  copper: 0
-  sappling: 3
-  vegetableSeed: 0
-  fruitSeed: 0
-  brick: 0
+  outputName: Vegetables
+  outputAmount: 5
+  outputIcon: {fileID: 21300000, guid: 119f93d0bcbf1e743bf5fcf237507d39, type: 3}
+  inputs:
+  - name: vegetableSeed
+    ammount: 5
