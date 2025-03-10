@@ -13,12 +13,12 @@ public abstract class Interactable : MonoBehaviour
 
     public virtual void CanInteract()
     {
-        outline.enabled = true;
+        if(outline != null) outline.enabled = true;
     }
 
     public virtual void CantInteract()
     {
-        outline.enabled = false;
+        if(outline != null) outline.enabled = false;
     }
 
     public virtual void Interact()

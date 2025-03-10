@@ -45,7 +45,6 @@ public class Crafter : Building
         }
 
         PlayerInventory.instance.AddItem(outputName, outputAmount);
-        NotificationManager.instance.ShowNotification($"Added {outputAmount} {outputName} to inventory.");
         Debug.Log("Crafted: " + outputName);
     }
 }

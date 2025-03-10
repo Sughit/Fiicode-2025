@@ -28,7 +28,7 @@ public class PlayerInventory : MonoBehaviour
         if (ModifyVariable(itemName, amount))
         {
             Debug.Log($"Added {amount} {itemName} to inventory.");
-            NotificationManager.instance.ShowNotification($"Added {amount} {itemName} to inventory.");
+            if(amount != 0) NotificationManager.instance.ShowNotification($"Added {amount} {itemName} to inventory.");
             SaveInventory(); // Save after adding
         }
         else
