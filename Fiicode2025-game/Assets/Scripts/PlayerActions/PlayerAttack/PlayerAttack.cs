@@ -52,6 +52,7 @@ public class PlayerAttack : MonoBehaviour
 
             // Instantiate the projectile at the cannon's position
             GameObject projectile = Instantiate(projectilePrefab, cannonOrigin.position, playerGfx.rotation);
+            projectile.GetComponent<Projectile>().senderGO = gameObject;
 
             // Option 1: Directly set velocity if the projectile has a Rigidbody
             Rigidbody rb = projectile.GetComponent<Rigidbody>();

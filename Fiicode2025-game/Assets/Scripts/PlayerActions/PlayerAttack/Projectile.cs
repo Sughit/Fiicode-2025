@@ -11,6 +11,8 @@ public class Projectile : MonoBehaviour
     // How fast the projectile rotates to align with the planet's surface.
     [SerializeField] private float rotationSpeed = 10f;
     [SerializeField] private float lifeTime = 3f;
+    [SerializeField] private float damage = 10f;
+    public GameObject senderGO;
 
     private Rigidbody rb;
 
@@ -23,6 +25,22 @@ public class Projectile : MonoBehaviour
         planet = GameObject.FindWithTag("Planet").transform;
 
         Destroy(this.gameObject, lifeTime);
+    }
+
+    void OnTriggerEnter(Collider collision)
+    {
+        // Ignoră coliziunea dacă proiectilul atinge obiectul care l-a trimis.
+        if (collision.gameObject == senderGO)
+            return;
+
+        // Dacă obiectul are componenta Health, aplică daune.
+        Health healthComponent = collision.gameObject.GetComponent<Health>();
+        if (healthComponent != null)
+        {
+            healthComponent.TakeDamage(damage);
+        }
+        // Distruge proiectilul după coliziune.
+        Destroy(gameObject);
     }
 
     void FixedUpdate()
