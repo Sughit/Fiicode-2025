@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eae6169726fafa440986d62541619a11, type: 3}
   m_Name: woodRecipe
   m_EditorClassIdentifier: 
-  outputName: Wood
+  outputName: wood
   outputAmount: 50
   outputIcon: {fileID: 21300000, guid: e9af78578671a3345b8cbf82f1f030b5, type: 3}
   inputs:
