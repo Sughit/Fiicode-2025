@@ -318,9 +318,14 @@ MonoBehaviour:
   - {r: 0.003921569, g: 0.04705883, b: 0.13725491, a: 0}
   colorThreshold: 0.3
   requiredPrefabs: []
-  requiredPrefabsMaxDistance: 3
+  requiredPrefabsMaxDistance: 1
   prohibitedPrefabs: []
-  prohibitedPrefabsMinDistance: 3
+  prohibitedPrefabsMinDistance: 1
+  requiredTags:
+  - FluidResource
+  requiredTagsMaxDistance: 1
+  prohibitedTags: []
+  prohibitedTagsMinDistance: 1
   canvas: {fileID: 1847092826834684746}
   errorText: {fileID: 853489303541930834}
 --- !u!1 &5112933314418323626

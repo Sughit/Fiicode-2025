@@ -147,6 +147,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buildingType: 0
   buildingName: Fluid Pump
+  miningInterval: 2
+  miningRange: 1
+  maxInventoryCapacity: 100
+  resourceItemName: 
+  icon: {fileID: 0}
+  solidMine: 0
+  currentInventoryCount: 0
 --- !u!1 &6624438708065979406
 GameObject:
   m_ObjectHideFlags: 0

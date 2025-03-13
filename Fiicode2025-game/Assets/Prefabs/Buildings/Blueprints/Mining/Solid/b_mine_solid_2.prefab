@@ -140,7 +140,7 @@ MonoBehaviour:
   prohibitedPrefabs: []
   prohibitedPrefabsMinDistance: 1
   requiredTags:
-  - Ore
+  - SolidResource
   requiredTagsMaxDistance: 1
   prohibitedTags: []
   prohibitedTagsMinDistance: 1

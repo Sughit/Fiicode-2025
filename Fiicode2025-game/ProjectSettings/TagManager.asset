@@ -8,6 +8,8 @@ TagManager:
   - Ruin
   - Resource
   - Ore
+  - SolidResource
+  - FluidResource
   layers:
   - Default
   - TransparentFX

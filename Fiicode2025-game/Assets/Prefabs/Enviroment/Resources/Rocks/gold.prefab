@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: 6599394940655441041}
   m_Layer: 7
   m_Name: gold
-  m_TagString: Ore
+  m_TagString: SolidResource
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647

@@ -15,6 +15,7 @@ public class Miner : Building
     [Tooltip("Numele resursei ce va fi adăugată în inventarul playerului. (Opțional: dacă nu e setat, se va folosi numele primului drop al resursei țintă)")]
     public string resourceItemName;
     public Sprite icon;
+    public bool solidMine = true;
 
     public int currentInventoryCount = 0; // numărul curent de iteme în inventar
     private Resource targetResource;        // resursa țintă pe care o minăm
@@ -93,7 +94,20 @@ public class Miner : Building
             Resource res = col.GetComponent<Resource>();
             if (res != null)
             {
-                return res;
+                if(solidMine)
+                {
+                    if(res.gameObject.tag == "SolidResource")
+                    {
+                        return res;
+                    }
+                }
+                else
+                {
+                    if(res.gameObject.tag == "FluidResource")
+                    {
+                        return res;
+                    }
+                }
             }
         }
         return null;
