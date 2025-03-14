@@ -12,6 +12,48 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddef467f1def77842abe511b0e5b8dde, type: 3}
   m_Name: s_cold 1
   m_EditorClassIdentifier: 
-  planetRadius: 1
-  noiseLayers: []
+  planetRadius: 25
+  noiseLayers:
+  - enabled: 1
+    useFirstLayerAsMask: 0
+    noiseSettings:
+      filterType: 0
+      simpleNoiseSettings:
+        strength: 0.05
+        numLayers: 6
+        baseRoughness: 1.21
+        roughness: 2.68
+        persistence: 0.5
+        centre: {x: 1.11, y: 0.92, z: -0.39}
+        minValue: 0.9
+      ridgidNoiseSettings:
+        strength: 0
+        numLayers: 0
+        baseRoughness: 0
+        roughness: 0
+        persistence: 0
+        centre: {x: 0, y: 0, z: 0}
+        minValue: 0
+        weightMultiplier: 0
+  - enabled: 1
+    useFirstLayerAsMask: 1
+    noiseSettings:
+      filterType: 1
+      simpleNoiseSettings:
+        strength: 0.07
+        numLayers: 4
+        baseRoughness: 1.07
+        roughness: 2.2
+        persistence: 0.5
+        centre: {x: 1.11, y: 0.92, z: -0.39}
+        minValue: 0.98
+      ridgidNoiseSettings:
+        strength: 1.52
+        numLayers: 6
+        baseRoughness: 1.41
+        roughness: 3.06
+        persistence: 0.82
+        centre: {x: 0, y: 0, z: 0}
+        minValue: 0.54
+        weightMultiplier: 0.78
   orientation: {x: 0, y: 0, z: 0, w: 1}

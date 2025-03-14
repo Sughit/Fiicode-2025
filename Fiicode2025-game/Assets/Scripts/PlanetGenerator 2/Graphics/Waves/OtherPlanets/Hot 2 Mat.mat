@@ -33,12 +33,12 @@ Material:
     - _FoamThreshold: 0.05
     - _MaxHeight: 1
     - _MinHeight: 0
-    - _PlanetRadius: 17.28268
+    - _PlanetRadius: 30
     - _WaterHeight: 0
     - _WaveScale: 2
     - _WaveSpeed: 1
     - _WaveStrength: 0.05
     m_Colors:
-    - _FoamColor: {r: 0.3617409, g: 0.3617409, b: 0.3617409, a: 0.3617409}
+    - _FoamColor: {r: 0.335849, g: 0.099534065, b: 0, a: 0.3617409}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

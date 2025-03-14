@@ -49,7 +49,7 @@ Material:
     - _WaveSpeed: 1
     - _WaveStrength: 0.05
     m_Colors:
-    - _FoamColor: {r: 0, g: 1, b: 0.9274397, a: 1}
+    - _FoamColor: {r: 0.019607844, g: 0.03137255, b: 0.30588236, a: 1}
     - _elevationMinMax: {r: 20, g: 21.97808, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
