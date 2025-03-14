@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class PlayerInteract : MonoBehaviour
 {
-    private Collider[] interactablesBuffer = new Collider[20];
+    private Collider[] interactablesBuffer = new Collider[5];
     private HashSet<Interactable> previousInteractables = new HashSet<Interactable>();
     private HashSet<Interactable> currentInteractables = new HashSet<Interactable>();
     private int interactableCount = 0;
@@ -77,7 +77,7 @@ public class PlayerInteract : MonoBehaviour
             Interactable interactable = interactablesBuffer[0].GetComponent<Interactable>();
             if (interactable != null)
             {
-                if (interactable.CompareTag("Ruin") || interactable.CompareTag("Resource") || interactable.CompareTag("Ore"))
+                if (interactable.CompareTag("Ruin") || interactable.CompareTag("Resource") || interactable.CompareTag("SolidResource"))
                 {
                     interactable.Interact(transform);
                 }
