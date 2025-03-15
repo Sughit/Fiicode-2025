@@ -497,3 +497,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buildingType: 7
   buildingName: Fluid Storage 1
+  solidStorage: 0

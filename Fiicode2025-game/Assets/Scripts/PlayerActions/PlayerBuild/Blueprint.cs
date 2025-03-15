@@ -180,44 +180,59 @@ public class Blueprint : MonoBehaviour
                 if (hitRenderer != null && hitRenderer.sharedMaterial != null)
                 {
                     Material planetMat = hitRenderer.sharedMaterial;
-                    // Obținem proprietățile din material (asigură-te că shaderul folosește aceste nume)
-                    float planetRadius = planetMat.GetFloat("_PlanetRadius");
-                    float minHeight = planetMat.GetFloat("_MinHeight");
-                    float maxHeight = planetMat.GetFloat("_MaxHeight");
-                    Texture2D gradientTexture = planetMat.GetTexture("_GradientTex") as Texture2D;
 
-                    if (gradientTexture != null)
+                    // Verificăm dacă materialul folosește shader-ul "Custom/w_PlanetHeightURPShader"
+                    if (planetMat.shader.name != "Custom/w_PlanetHeightURPShader")
                     {
-                        float height = selectedHit.point.magnitude - planetRadius;
-                        float t = Mathf.InverseLerp(minHeight, maxHeight, height);
-                        t = Mathf.Clamp01(t);
-                        surfaceColor = gradientTexture.GetPixelBilinear(t, 0.5f);
+                        valid = false;
+                        InvalidReason = "Materialul nu este de tipul Custom/w_PlanetHeightURPShader!";
                     }
                     else
                     {
-                        if (planetMat.HasProperty("_BaseColor"))
-                            surfaceColor = planetMat.GetColor("_BaseColor");
+                        // Obținem proprietățile din material (asigură-te că shaderul folosește aceste nume)
+                        float planetRadius = planetMat.GetFloat("_PlanetRadius");
+                        float minHeight = planetMat.GetFloat("_MinHeight");
+                        float maxHeight = planetMat.GetFloat("_MaxHeight");
+                        Texture2D gradientTexture = planetMat.GetTexture("_GradientTex") as Texture2D;
+
+                        if (gradientTexture != null)
+                        {
+                            float height = selectedHit.point.magnitude - planetRadius;
+                            float t = Mathf.InverseLerp(minHeight, maxHeight, height);
+                            t = Mathf.Clamp01(t);
+                            surfaceColor = gradientTexture.GetPixelBilinear(t, 0.5f);
+                        }
                         else
-                            surfaceColor = planetMat.color;
+                        {
+                            if (planetMat.HasProperty("_BaseColor"))
+                                surfaceColor = planetMat.GetColor("_BaseColor");
+                            else
+                                surfaceColor = planetMat.color;
+                        }
+
+                        bool colorAllowed = false;
+                        foreach (Color allowed in allowedColors)
+                        {
+                            if (Mathf.Abs(surfaceColor.r - allowed.r) < colorThreshold &&
+                                Mathf.Abs(surfaceColor.g - allowed.g) < colorThreshold &&
+                                Mathf.Abs(surfaceColor.b - allowed.b) < colorThreshold)
+                            {
+                                colorAllowed = true;
+                                break;
+                            }
+                        }
+
+                        if (!colorAllowed)
+                        {
+                            valid = false;
+                            InvalidReason = "Culoarea suprafeței nu este permisă!";
+                        }
                     }
                 }
-
-                bool colorAllowed = false;
-                foreach (Color allowed in allowedColors)
-                {
-                    if (Mathf.Abs(surfaceColor.r - allowed.r) < colorThreshold &&
-                        Mathf.Abs(surfaceColor.g - allowed.g) < colorThreshold &&
-                        Mathf.Abs(surfaceColor.b - allowed.b) < colorThreshold)
-                    {
-                        colorAllowed = true;
-                        break;
-                    }
-                }
-
-                if (!colorAllowed)
+                else
                 {
                     valid = false;
-                    InvalidReason = "Culoarea suprafeței nu este permisă!";
+                    InvalidReason = "Renderer-ul sau materialul lipsește!";
                 }
             }
             else
@@ -226,6 +241,7 @@ public class Blueprint : MonoBehaviour
                 InvalidReason = "Nu s-a găsit o suprafață validă sub blueprint!";
             }
         }
+
 
         // 3) Verificăm requiredPrefabs (trebuie să fie aproape de minim unul)
         if (valid && requiredPrefabs != null && requiredPrefabs.Length > 0)

@@ -3,7 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Scan Inventory", menuName = "Custom/Scan Inventory")]
 public class ScanInventory : ScriptableObject
 {
-    // Resurse naturale
+    [Header("Resources")]
     public bool iron;
     public bool gold;
     public bool silver;
@@ -16,7 +16,7 @@ public class ScanInventory : ScriptableObject
     public bool brick;
     public bool copper;
 
-    // Cladiri
+    [Header("Buildings")]
     public bool sMine1;
     public bool sMine2;
     public bool fMine1;

@@ -3,7 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Inventory", menuName = "Custom/Inventory")]
 public class Inventory : ScriptableObject
 {
-    // Raw resources
+    [Header("Resources")]
     public int wood;
     public int stone;
     public int iron;
@@ -13,11 +13,19 @@ public class Inventory : ScriptableObject
     public int clay;
     public int copper;
 
-    // Seeds
+    [Header("Seeds")]
     public int sappling;
     public int vegetableSeed;
     public int fruitSeed;
 
-    // Processed resources
+    [Header("Processed Resources")]
+    public int ironBar;
+    public int steel;
+    public int goldBar;
+    public int silverBar;
+    public int copperWire;
+    public int cuttedStone;
     public int brick;
+    public int oilBarrel;
+    
 }

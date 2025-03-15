@@ -1008,6 +1008,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buildingType: 7
   buildingName: Fluid Storage 2
+  solidStorage: 0
 --- !u!1 &6864289401217087705
 GameObject:
   m_ObjectHideFlags: 0
