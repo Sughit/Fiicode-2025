@@ -12,21 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d68db0505d960443a3a09fe2e265a82, type: 3}
   m_Name: PlayerScanInventory
   m_EditorClassIdentifier: 
-  iron: 1
+  iron: 0
   gold: 0
-  silver: 1
-  coal: 1
+  silver: 0
+  coal: 0
   wood: 1
   stone: 1
   water: 0
   petrolium: 0
   clay: 0
-  brick: 1
-  copper: 1
+  brick: 0
+  copper: 0
   sMine1: 1
-  sMine2: 0
+  sMine2: 1
   fMine1: 0
-  greenHouse: 0
+  greenHouse: 1
   sStorage1: 0
   sStorage2: 0
   sStorage3: 0

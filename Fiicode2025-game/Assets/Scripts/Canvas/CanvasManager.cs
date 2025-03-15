@@ -156,25 +156,44 @@ public class CanvasManager : MonoBehaviour
     // Populează dropdown-ul cu opțiuni și cu referințele la CraftingInfoSO
     public void SetupCrafterDropdown(List<string> options, List<CraftingInfoSO> recipes)
     {
-        if(craftingDropdown == null) return;
+        if (craftingDropdown == null) return;
         craftingDropdown.ClearOptions();
         craftingDropdown.AddOptions(options);
         // Eliminăm eventualii listener anteriori
         craftingDropdown.onValueChanged.RemoveAllListeners();
-        // Adăugăm listener-ul care actualizează iconița din CraftingInfoSO
+        // Adăugăm listener-ul care actualizează iconița din CraftingInfoSO și reține ultima rețetă selectată
         craftingDropdown.onValueChanged.AddListener((index) =>
         {
-            if(index < recipes.Count)
+            if (index < recipes.Count)
             {
                 SetCraftingIcons(recipes[index].outputIcon);
                 currentRecipe = recipes[index];
+                // Dacă obiectul interacționat este un Crafter, actualizăm indexul ultimei rețete
+                if (interactionGO != null)
+                {
+                    Crafter crafter = interactionGO.GetComponent<Crafter>();
+                    if (crafter != null)
+                    {
+                        crafter.SetLastSelectedRecipe(index);
+                    }
+                }
             }
         });
-        // Setăm iconița inițială, dacă există opțiuni și referințe
-        if(options.Count > 0 && recipes.Count > 0)
+        // Setăm iconița și rețeta inițială, dacă există opțiuni
+        if (options.Count > 0 && recipes.Count > 0)
         {
             SetCraftingIcons(recipes[craftingDropdown.value].outputIcon);
             currentRecipe = recipes[craftingDropdown.value];
+        }
+    }
+
+
+    public void SetDropdownSelectedOption(int index)
+    {
+        if (craftingDropdown != null)
+        {
+            craftingDropdown.value = index;
+            craftingDropdown.RefreshShownValue();
         }
     }
 

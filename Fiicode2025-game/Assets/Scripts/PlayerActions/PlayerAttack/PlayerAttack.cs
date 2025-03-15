@@ -10,6 +10,7 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private Transform playerGfx;
 
     [Header("Projectile Settings")]
+    [SerializeField] private bool fastShooting = false;
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private float projectileSpeed = 10f;
     //[SerializeField] private float damage = 10f;
@@ -46,6 +47,14 @@ public class PlayerAttack : MonoBehaviour
 
     void Attack()
     {
+        if(fastShooting)
+        {
+            AudioManager.instance.PlaySound("fastShooting");
+        }
+        else
+        {
+            AudioManager.instance.PlaySound("slowShooting");
+        }
         foreach (Transform cannonOrigin in cannonOrigins)
         {
             if (!cannonOrigin) continue;
