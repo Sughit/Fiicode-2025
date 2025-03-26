@@ -164,7 +164,6 @@ public class RandomSpawner : MonoBehaviour
                     float realAlt = (spawnOrigin - planet.transform.position).magnitude - planetRadius;
 
                     // 5) Convertim la un T între 0..1
-                    // T = (realAlt - minHeight) / (maxHeight - minHeight)
                     float t = Mathf.InverseLerp(minHeight, maxHeight, realAlt);
 
                     // 6) Verificăm dacă se încadrează în [data.minGradientPercent..data.maxGradientPercent]
@@ -177,15 +176,16 @@ public class RandomSpawner : MonoBehaviour
                     // OK, suntem în banda corectă de gradient => formăm grup
                     int groupCount = Mathf.Min(data.maxGroupSize, data.count - successfulSpawns);
 
-                    List<Vector3> groupPositions = new List<Vector3>();
+                    // NOTĂ: Acum salvăm atât poziția, cât și normalul, pentru fiecare punct valid
+                    List<(Vector3 pos, Vector3 normal)> groupPositions = new List<(Vector3 pos, Vector3 normal)>();
 
-                    // Vectori de offset 2D
-                    Vector3 normal = (spawnOrigin - planet.transform.position).normalized;
-                    Vector3 tangent = Vector3.Cross(normal, Vector3.up);
+                    // Vectori de offset 2D (tangent/bitangent față de normal)
+                    Vector3 normalMain = (spawnOrigin - planet.transform.position).normalized;
+                    Vector3 tangent = Vector3.Cross(normalMain, Vector3.up);
                     if (tangent == Vector3.zero)
-                        tangent = Vector3.Cross(normal, Vector3.right);
+                        tangent = Vector3.Cross(normalMain, Vector3.right);
                     tangent.Normalize();
-                    Vector3 bitangent = Vector3.Cross(normal, tangent).normalized;
+                    Vector3 bitangent = Vector3.Cross(normalMain, tangent).normalized;
 
                     float minDist = data.customMinDistance;
                     float maxDist = data.customMaxDistance;
@@ -199,25 +199,27 @@ public class RandomSpawner : MonoBehaviour
                             Vector2 offset2D = Random.insideUnitCircle * data.groupSpawnRadius;
                             Vector3 offset = tangent * offset2D.x + bitangent * offset2D.y;
 
-                            // Pornim un ray mic "de sus" de la spawnOrigin + offset + normal * ceva
-                            Vector3 candidateStart = spawnOrigin + offset + normal * 50f;
-                            Vector3 downDir = -normal;
+                            // Pornim un ray mic "de sus" de la spawnOrigin + offset + normalMain * ceva
+                            Vector3 candidateStart = spawnOrigin + offset + normalMain * 50f;
+                            Vector3 downDir = -normalMain;
 
                             RaycastHit candidateHit;
                             if (Physics.Raycast(candidateStart, downDir, out candidateHit, 200f))
                             {
-                                // Pozitie finala
+                                // Poziție finală + normal
                                 Vector3 candidatePos = candidateHit.point;
+                                Vector3 candidateNormal = candidateHit.normal;
 
                                 // Verificare distanțe
                                 if (IsValidCandidate(candidatePos, groupPositions, minDist, maxDist, spawnOrigin))
                                 {
-                                    // Verificăm gradient și pentru acest punct, dacă vrei:
+                                    // Verificăm gradient și pentru acest punct
                                     float cAlt = (candidatePos - planet.transform.position).magnitude - planetRadius;
                                     float cT = Mathf.InverseLerp(minHeight, maxHeight, cAlt);
                                     if (cT >= data.minGradientPercent && cT <= data.maxGradientPercent)
                                     {
-                                        groupPositions.Add(candidatePos);
+                                        // Salvăm și normalul de la raycast
+                                        groupPositions.Add((candidatePos, candidateNormal));
                                         foundPosition = true;
                                         break;
                                     }
@@ -231,11 +233,13 @@ public class RandomSpawner : MonoBehaviour
                     // Instanțiem
                     if (groupPositions.Count > 0)
                     {
-                        foreach (var pos in groupPositions)
+                        foreach (var (pos, normal) in groupPositions)
                         {
                             GameObject randomPrefab = data.prefabVariations[Random.Range(0, data.prefabVariations.Count)];
                             GameObject spawned = Instantiate(randomPrefab, pos, Quaternion.identity, transform);
-                            spawned.transform.up = (pos - planet.transform.position).normalized;
+
+                            // Aici setăm orientarea după normalul real al suprafeței
+                            spawned.transform.up = normal;
 
                             globalSpawnedPositions.Add(pos);
                         }
@@ -251,9 +255,9 @@ public class RandomSpawner : MonoBehaviour
     }
 
     /// <summary>
-    /// Validarea distanței față de centrul grupului și față de alte obiecte.
+    /// Validarea distanței față de centrul grupului și față de alte obiecte deja plasate.
     /// </summary>
-    private bool IsValidCandidate(Vector3 candidate, List<Vector3> groupPositions, float minDist, float maxDist, Vector3 origin)
+    private bool IsValidCandidate(Vector3 candidate, List<(Vector3 pos, Vector3 normal)> groupPositions, float minDist, float maxDist, Vector3 origin)
     {
         if (Vector3.Distance(candidate, origin) > maxDist)
             return false;
@@ -262,7 +266,7 @@ public class RandomSpawner : MonoBehaviour
             if (Vector3.Distance(candidate, globalPos) < minDist)
                 return false;
 
-        foreach (var grpPos in groupPositions)
+        foreach (var (grpPos, _) in groupPositions)
             if (Vector3.Distance(candidate, grpPos) < minDist)
                 return false;
 
