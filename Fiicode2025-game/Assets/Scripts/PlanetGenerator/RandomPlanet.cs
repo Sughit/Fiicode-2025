@@ -29,13 +29,29 @@ public class RandomPlanet : Planet {
         GeneratePlanet();
     }
 
+    /// <summary>
+    /// Șterge toți copiii (GameObject-urile) din acest transform,
+    /// folosind DestroyImmediate, astfel încât să funcționeze și în modul Edit.
+    /// </summary>
+    private void ClearChildren()
+    {
+        // Parcurgem copiii invers (pentru siguranță).
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            DestroyImmediate(transform.GetChild(i).gameObject);
+        }
+    }
+
     // Clonăm baseShapeSettings în shapeSettings (câmpul moștenit din Planet) și aplicăm variațiile doar pe copie.
     public new void GeneratePlanet() {
-        // Dacă avem un ShapeSettings sursă, clonăm pentru a nu modifica asset-ul original
+        // 1. Mai întâi ștergem toți copiii existenți (dacă regenerăm planeta de multiple ori în Inspector)
+        ClearChildren();
+
+        // 2. Continuăm logica originală de generare
         if (baseShapeSettings != null) {
             shapeSettings = CloneShapeSettings(baseShapeSettings);
         }
-        
+
         // Randomizează raza planetei în funcție de mărime
         float minRadius, maxRadius;
         switch (planetSize) {
@@ -66,7 +82,6 @@ public class RandomPlanet : Planet {
             colorKeys[3] = new GradientColorKey(new Color(0.5f, 0f, 0.5f), 0.75f);
             colorKeys[4] = new GradientColorKey(Color.white, 1f);
 
-            // Setăm alpha la 1 pentru toate punctele
             alphaKeys = new GradientAlphaKey[5];
             for (int i = 0; i < 5; i++) {
                 alphaKeys[i] = new GradientAlphaKey(1f, colorKeys[i].time);
@@ -95,7 +110,6 @@ public class RandomPlanet : Planet {
             colorKeys[4] = new GradientColorKey(new Color(0.53f, 0.32f, 0.09f), 0.80f);  // maro
             colorKeys[5] = new GradientColorKey(new Color(0.94f, 0.94f, 0.94f), 1.0f);   // alb
 
-            // Toate aceste culori vor avea alpha = 1
             alphaKeys = new GradientAlphaKey[colorKeys.Length];
             for (int i = 0; i < colorKeys.Length; i++)
             {
@@ -107,15 +121,12 @@ public class RandomPlanet : Planet {
             colorKeys = new GradientColorKey[keyCount];
             alphaKeys = new GradientAlphaKey[keyCount];
 
-            Vector3 sumColor = Vector3.zero; // Vector3(r, g, b) pentru a ține suma culorilor
+            Vector3 sumColor = Vector3.zero;
 
             for (int i = 0; i < keyCount; i++) {
                 float t = i / (float)(keyCount - 1);
-
-                // Generăm o culoare random
                 Color randomColor = new Color(Random.value, Random.value, Random.value);
 
-                // O adăugăm la suma totală, pentru statistici
                 sumColor += new Vector3(randomColor.r, randomColor.g, randomColor.b);
 
                 colorKeys[i] = new GradientColorKey(randomColor, t);
@@ -127,8 +138,6 @@ public class RandomPlanet : Planet {
 
             // Calculează media culorilor (R, G, B)
             Vector3 avgColor = sumColor / keyCount;
-
-            // Verificăm care canal e dominant
             float maxValue = Mathf.Max(avgColor.x, Mathf.Max(avgColor.y, avgColor.z));
 
             if (Mathf.Approximately(maxValue, avgColor.x)) {
@@ -147,11 +156,10 @@ public class RandomPlanet : Planet {
         gradient.SetKeys(colorKeys, alphaKeys);
         colourSettings.gradient = gradient;
 
-        // Randomizează numărul de layere (straturi) de zgomot între minNoiseLayers și maxNoiseLayers
+        // Randomizează numărul de layere (straturi) de zgomot
         int targetLayerCount = Random.Range(minNoiseLayers, maxNoiseLayers + 1);
         int currentLayers = (shapeSettings.noiseLayers != null) ? shapeSettings.noiseLayers.Length : 0;
         if (currentLayers < targetLayerCount) {
-            // Adaugă layere clonând ultimul layer existent (sau creând unul nou dacă nu există niciunul)
             ShapeSettings.NoiseLayer[] newLayers = new ShapeSettings.NoiseLayer[targetLayerCount];
             for (int i = 0; i < currentLayers; i++) {
                 newLayers[i] = shapeSettings.noiseLayers[i];
@@ -163,7 +171,6 @@ public class RandomPlanet : Planet {
             shapeSettings.noiseLayers = newLayers;
         }
         else if (currentLayers > targetLayerCount) {
-            // Taie layerele în exces
             ShapeSettings.NoiseLayer[] limitedLayers = new ShapeSettings.NoiseLayer[targetLayerCount];
             for (int i = 0; i < targetLayerCount; i++) {
                 limitedLayers[i] = shapeSettings.noiseLayers[i];
@@ -171,11 +178,11 @@ public class RandomPlanet : Planet {
             shapeSettings.noiseLayers = limitedLayers;
         }
 
-        // Pentru fiecare layer, aplică variații pentru toate variabilele zgomotului, în limite moderate
+        // Pentru fiecare layer, aplică variații ...
         if (shapeSettings.noiseLayers != null) {
             foreach (var layer in shapeSettings.noiseLayers) {
                 if (layer.noiseSettings != null) {
-                    // Pentru tipul Simple
+                    // FilterType.Simple
                     if (layer.noiseSettings.filterType == NoiseSettings.FilterType.Simple && layer.noiseSettings.simpleNoiseSettings != null) {
                         var settings = layer.noiseSettings.simpleNoiseSettings;
                         settings.strength = Random.Range(settings.strength * 0.9f, settings.strength * 1.1f);
@@ -187,7 +194,7 @@ public class RandomPlanet : Planet {
                         int origLayers = settings.numLayers;
                         settings.numLayers = Random.Range(Mathf.Max(1, origLayers - 1), Mathf.Min(8, origLayers + 1) + 1);
                     }
-                    // Pentru tipul Ridgid
+                    // FilterType.Ridgid
                     else if (layer.noiseSettings.filterType == NoiseSettings.FilterType.Ridgid && layer.noiseSettings.ridgidNoiseSettings != null) {
                         var settings = layer.noiseSettings.ridgidNoiseSettings;
                         settings.strength = Random.Range(settings.strength * 0.9f, settings.strength * 1.1f);
@@ -204,14 +211,15 @@ public class RandomPlanet : Planet {
             }
         }
 
-        // Apelează metoda de generare din clasa de bază pentru a crea mesh-ul și culorile
+        // Generează efectiv planeta (mesh, culori etc.) din clasa de bază
         base.GeneratePlanet();
 
-        // Actualizează uniforma pentru raza planetei pe material, dacă este setat
+        // Actualizează uniforma pentru raza planetei pe material, dacă e setat
         if (colourSettings.planetMaterial != null) {
             colourSettings.planetMaterial.SetFloat("_PlanetRadius", shapeSettings.planetRadius);
         }
 
+        // Instanțiere obiecte pe planetă (dacă e un spawner)
         RandomSpawner spawner = GetComponent<RandomSpawner>();
         if (spawner != null)
         {
@@ -223,8 +231,6 @@ public class RandomPlanet : Planet {
         }
     }
 
-    // Metodă pentru clonarea unui ShapeSettings (realizează o clonare superficială a valorilor),
-    // însă noiseLayers și noiseSettings vor fi clonate profund în CloneNoiseLayer.
     private ShapeSettings CloneShapeSettings(ShapeSettings original) {
         ShapeSettings clone = new ShapeSettings();
         clone.planetRadius = original.planetRadius;
@@ -235,13 +241,9 @@ public class RandomPlanet : Planet {
                 clone.noiseLayers[i] = CloneNoiseLayer(original.noiseLayers[i]);
             }
         }
-
-        // Alte câmpuri din ShapeSettings pot fi clonate aici (dacă există)
-
         return clone;
     }
 
-    // Metodă utilitară pentru clonarea unui layer de zgomot (copie profundă a noiseSettings).
     private ShapeSettings.NoiseLayer CloneNoiseLayer(ShapeSettings.NoiseLayer original) {
         ShapeSettings.NoiseLayer clone = new ShapeSettings.NoiseLayer();
         clone.enabled = original.enabled;
@@ -250,12 +252,10 @@ public class RandomPlanet : Planet {
         return clone;
     }
 
-    // Metodă de clonare completă a unui NoiseSettings
     private NoiseSettings CloneNoiseSettings(NoiseSettings original) {
         NoiseSettings clone = new NoiseSettings();
         clone.filterType = original.filterType;
 
-        // Clonăm setările Simple
         if (original.simpleNoiseSettings != null) {
             clone.simpleNoiseSettings = new NoiseSettings.SimpleNoiseSettings();
             clone.simpleNoiseSettings.strength       = original.simpleNoiseSettings.strength;
@@ -263,21 +263,20 @@ public class RandomPlanet : Planet {
             clone.simpleNoiseSettings.baseRoughness  = original.simpleNoiseSettings.baseRoughness;
             clone.simpleNoiseSettings.roughness      = original.simpleNoiseSettings.roughness;
             clone.simpleNoiseSettings.persistence    = original.simpleNoiseSettings.persistence;
-            clone.simpleNoiseSettings.centre        = original.simpleNoiseSettings.centre;
+            clone.simpleNoiseSettings.centre         = original.simpleNoiseSettings.centre;
             clone.simpleNoiseSettings.minValue       = original.simpleNoiseSettings.minValue;
         }
 
-        // Clonăm setările Ridgid
         if (original.ridgidNoiseSettings != null) {
             clone.ridgidNoiseSettings = new NoiseSettings.RidgidNoiseSettings();
-            clone.ridgidNoiseSettings.strength        = original.ridgidNoiseSettings.strength;
-            clone.ridgidNoiseSettings.numLayers       = original.ridgidNoiseSettings.numLayers;
-            clone.ridgidNoiseSettings.baseRoughness   = original.ridgidNoiseSettings.baseRoughness;
-            clone.ridgidNoiseSettings.roughness       = original.ridgidNoiseSettings.roughness;
-            clone.ridgidNoiseSettings.persistence     = original.ridgidNoiseSettings.persistence;
-            clone.ridgidNoiseSettings.centre          = original.ridgidNoiseSettings.centre;
-            clone.ridgidNoiseSettings.minValue        = original.ridgidNoiseSettings.minValue;
-            clone.ridgidNoiseSettings.weightMultiplier= original.ridgidNoiseSettings.weightMultiplier;
+            clone.ridgidNoiseSettings.strength         = original.ridgidNoiseSettings.strength;
+            clone.ridgidNoiseSettings.numLayers        = original.ridgidNoiseSettings.numLayers;
+            clone.ridgidNoiseSettings.baseRoughness    = original.ridgidNoiseSettings.baseRoughness;
+            clone.ridgidNoiseSettings.roughness        = original.ridgidNoiseSettings.roughness;
+            clone.ridgidNoiseSettings.persistence      = original.ridgidNoiseSettings.persistence;
+            clone.ridgidNoiseSettings.centre           = original.ridgidNoiseSettings.centre;
+            clone.ridgidNoiseSettings.minValue         = original.ridgidNoiseSettings.minValue;
+            clone.ridgidNoiseSettings.weightMultiplier = original.ridgidNoiseSettings.weightMultiplier;
         }
 
         return clone;

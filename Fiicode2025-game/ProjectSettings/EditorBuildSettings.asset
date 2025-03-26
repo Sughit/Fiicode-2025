@@ -29,6 +29,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Planets/Cold 2.unity
     guid: 366fa2bad66b2a448b127347fec95da5
+  - enabled: 1
+    path: Assets/Scenes/Levels/SceneHostile.unity
+    guid: 32bcf7db2a4160f458d4297d3908ea64
+  - enabled: 1
+    path: Assets/Scenes/Levels/SceneMarket.unity
+    guid: fb1512c3434626843aec4e4b4a758ba3
+  - enabled: 1
+    path: Assets/Scenes/Levels/SceneResources.unity
+    guid: 0370a48fdd2dea44da8f2a0b7141fa4c
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
