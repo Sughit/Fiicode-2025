@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class MapNode : MonoBehaviour
 {
-    public enum NodeType { Resources, Hostile, Market }
+    public enum NodeType { Resources, Hostile, Market, Boss }
 
     [Header("Tipul nodului")]
     public NodeType nodeType;
@@ -12,12 +12,46 @@ public class MapNode : MonoBehaviour
     [Header("Conexiuni")]
     public List<MapNode> parents = new List<MapNode>();
     public List<MapNode> children = new List<MapNode>();
+    [SerializeField]private  Sprite[] imagine;
 
     // Nodul pe care jucătorul se află ACUM (în harta curentă)
     public static MapNode currentNode;
 
     // Ultimul nod pe care s-a dat click (pentru a focaliza camera la întoarcere)
     public static MapNode lastNode;
+    void Start()
+    {
+        switch(nodeType)
+        {
+            case NodeType.Resources:
+            GetComponent<SpriteRenderer>().sprite = imagine[0];
+            break;
+
+            case NodeType.Hostile:
+            GetComponent<SpriteRenderer>().sprite = imagine[1];
+            break;
+    
+            case NodeType.Market:
+            GetComponent<SpriteRenderer>().sprite = imagine[2];
+            break;
+
+            case NodeType.Boss:
+            GetComponent<SpriteRenderer>().sprite = imagine[3];
+            break;
+
+            default:
+            break;
+
+        }
+    }
+    private void OnMouseEnter()
+    {
+        transform.localScale = new Vector3(transform.localScale.x+0.3f, transform.localScale.y+0.3f, transform.localScale.z+0.3f);
+    }
+    private void OnMouseExit()
+    {
+        transform.localScale = new Vector3(transform.localScale.x-0.3f, transform.localScale.y-0.3f, transform.localScale.z-0.3f);
+    }
 
     private void OnMouseDown()
     {
@@ -69,6 +103,9 @@ public class MapNode : MonoBehaviour
                 break;
             case NodeType.Market:
                 SceneManager.LoadScene("SceneMarket");
+                break;
+            case NodeType.Boss:
+                SceneManager.LoadScene("SceneBoss");
                 break;
             default:
                 Debug.LogWarning("Tipul nodului nu are scenă asociată!");

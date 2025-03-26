@@ -9,122 +9,85 @@ public class MapGenerator : MonoBehaviour
         Horizontal
     }
 
-    [Header("Parametrii de configurare")]
+    [Header("Config Parameters")]
     public MapOrientation orientation = MapOrientation.Vertical;
-
-    [Tooltip("Dacă orientarea e Verticală, 'numberOfColumns' = câte niveluri sus-jos")]
-    public int numberOfColumns = 5; // ex: 5 niveluri
-    [Tooltip("Dacă orientarea e Verticală, 'numberOfRows' = ignorat, sau invers pt orizontal")]
-    public int numberOfRows = 5;
-
-    [Tooltip("Minim noduri pe fiecare nivel (coloană/rând)")]
+    public int totalLevels = 15;
     public int minNodesPerLevel = 1;
-
-    [Tooltip("Maxim noduri pe fiecare nivel (coloană/rând)")]
     public int maxNodesPerLevel = 3;
-
-    [Range(0f, 1f)]
-    [Tooltip("Probabilitatea de a avea încă un părinte (pentru un nod din nivelul curent)")]
     public float multipleParentsChance = 0.3f;
 
-    [Header("Parametrii de afișare în scenă")]
-    [Tooltip("Prefab ce conține scriptul MapNode + un Collider")]
+    [Header("Scene Display Parameters")]
     public GameObject nodePrefab;
-
-    [Tooltip("Distanța între niveluri pe axa X sau Y, în funcție de orientare")]
     public float distanceX = 2f;
     public float distanceY = 2f;
-
-    [Tooltip("Părintele (empty) sub care vom pune nodurile și liniile")]
     public Transform mapParent;
+    [SerializeField] private Material material;
 
-    // Reținem nodurile generate, pe niveluri
     private List<List<MapNode>> mapLevels = new List<List<MapNode>>();
+    private Dictionary<MapNode, int> marketCooldown = new Dictionary<MapNode, int>();
 
-    /// <summary>
-    /// Apelează asta din Editor (prin buton) sau din cod, pentru a genera harta.
-    /// </summary>
     public void GenerateMap()
     {
-        // 1. Curățăm ce exista anterior
         ClearMapVisuals();
         mapLevels.Clear();
-
-        // 2. Determinăm câte niveluri facem, pe baza orientării
-        int totalLevels = (orientation == MapOrientation.Vertical) ? numberOfColumns : numberOfRows;
-
-        // 3. Generăm nodurile (GameObject-uri cu MapNode) nivel cu nivel
+        
         for (int lvl = 0; lvl < totalLevels; lvl++)
         {
-            int numNodesInLevel = Random.Range(minNodesPerLevel, maxNodesPerLevel + 1);
+            int numNodesInLevel = (lvl == totalLevels - 1) ? 1 : Random.Range(minNodesPerLevel, maxNodesPerLevel + 1);
             List<MapNode> levelNodes = new List<MapNode>();
 
             for (int n = 0; n < numNodesInLevel; n++)
             {
-                // Instanțiem prefab-ul
                 GameObject go = Instantiate(nodePrefab, mapParent ? mapParent : transform);
-
-                // Scriptul MapNode
                 MapNode nodeComp = go.GetComponent<MapNode>();
                 if (nodeComp == null)
-                    nodeComp = go.AddComponent<MapNode>(); // în caz că lipsește
+                    nodeComp = go.AddComponent<MapNode>();
 
-                // Poziționăm
                 if (orientation == MapOrientation.Vertical)
                 {
-                    // lvl -> Y (vertical), n -> X
-                    go.transform.localPosition = new Vector3(
-                        n * distanceX, 
-                        -lvl * distanceY, 
-                        0f
-                    );
+                    go.transform.localPosition = new Vector3(n * distanceX, -lvl * distanceY, 0f);
                 }
-                else // Horizontal
+                else
                 {
-                    // lvl -> X, n -> Y
-                    go.transform.localPosition = new Vector3(
-                        lvl * distanceX,
-                        -n * distanceY,
-                        0f
-                    );
+                    go.transform.localPosition = new Vector3(lvl * distanceX, -n * distanceY, 0f);
                 }
 
                 go.name = $"Node_{lvl}_{n}";
+                nodeComp.nodeType = DetermineNodeType(lvl, nodeComp); // Corectare aici
                 levelNodes.Add(nodeComp);
             }
 
             mapLevels.Add(levelNodes);
-
-            // Conectăm la nivelul anterior
-            if (lvl > 0)
-            {
-                ConnectLevels(mapLevels[lvl - 1], levelNodes);
-            }
+            if (lvl > 0) ConnectLevels(mapLevels[lvl - 1], levelNodes);
         }
 
-        // 4. Introducem "multiple parents" cu o probabilitate
         IntroduceMultipleParents();
-
-        // 5. Desenăm line renderer între nodurile părinte-copil
         CreateLines();
-
         Debug.Log($"Map generated with {totalLevels} levels.");
     }
 
-    /// <summary>
-    /// Conectăm nodurile de la nivelul anterior cu noduri random din nivelul curent,
-    /// apoi ne asigurăm că fiecare nod din nivelul curent are minim un părinte.
-    /// </summary>
+    private MapNode.NodeType DetermineNodeType(int level, MapNode node) // Modificat aici pentru a utiliza MapNode.NodeType
+    {
+        if (level == 0) return MapNode.NodeType.Resources; // Corectare aici
+        if (level == totalLevels - 1) return MapNode.NodeType.Boss; // Corectare aici
+        
+        float rand = Random.value;
+        if (rand < 0.4f) return MapNode.NodeType.Hostile; // Corectare aici
+        if (rand < 0.75f) return MapNode.NodeType.Resources; // Corectare aici
+
+        if (marketCooldown.ContainsKey(node)) return MapNode.NodeType.Hostile; // Corectare aici
+        marketCooldown[node] = 3;
+        return MapNode.NodeType.Market; // Corectare aici
+    }
+
     private void ConnectLevels(List<MapNode> previousLevel, List<MapNode> currentLevel)
     {
-        // a) Fiecare nod din previousLevel -> un nod random din currentLevel
         foreach (var parent in previousLevel)
         {
             var child = currentLevel[Random.Range(0, currentLevel.Count)];
             CreateParentChildLink(parent, child);
         }
 
-        // b) Asigurăm că fiecare nod din currentLevel are cel puțin 1 părinte
         foreach (var child in currentLevel)
         {
             if (child.parents.Count == 0)
@@ -135,21 +98,12 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Creează relația părinte-copil la nivel de MapNode.
-    /// </summary>
     private void CreateParentChildLink(MapNode parent, MapNode child)
     {
-        if (!parent.children.Contains(child))
-            parent.children.Add(child);
-        if (!child.parents.Contains(parent))
-            child.parents.Add(parent);
+        if (!parent.children.Contains(child)) parent.children.Add(child);
+        if (!child.parents.Contains(parent)) child.parents.Add(parent);
     }
 
-    /// <summary>
-    /// Cu o anumită probabilitate, mai adăugăm un părinte din nivelul anterior
-    /// pentru fiecare nod (de la al doilea nivel în sus).
-    /// </summary>
     private void IntroduceMultipleParents()
     {
         for (int lvl = 1; lvl < mapLevels.Count; lvl++)
@@ -171,36 +125,25 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Desenează linii (LineRenderer) între părinte și copil, pentru fiecare nod.
-    /// </summary>
     private void CreateLines()
     {
-        // Parcurgem toate nivelurile
-        for (int lvl = 0; lvl < mapLevels.Count; lvl++)
+        foreach (var level in mapLevels)
         {
-            // Parcurgem fiecare nod (părinte)
-            foreach (MapNode parentNode in mapLevels[lvl])
+            foreach (var parentNode in level)
             {
-                // Desenăm linie pentru fiecare copil
-                foreach (MapNode childNode in parentNode.children)
+                foreach (var childNode in parentNode.children)
                 {
                     if (childNode == null) continue;
 
-                    GameObject lineObj = new GameObject(
-                        $"Line_{parentNode.name}_to_{childNode.name}"
-                    );
-
-                    // Punem linia sub același părinte (mapParent) pentru organizare
+                    GameObject lineObj = new GameObject($"Line_{parentNode.name}_to_{childNode.name}");
                     lineObj.transform.SetParent(mapParent ? mapParent : transform, false);
-
                     var lr = lineObj.AddComponent<LineRenderer>();
                     lr.positionCount = 2;
                     lr.useWorldSpace = false;
                     lr.startWidth = 0.05f;
                     lr.endWidth = 0.05f;
+                    lr.material = material;
 
-                    // Poziții locale
                     Vector3 pPos = parentNode.transform.localPosition;
                     Vector3 cPos = childNode.transform.localPosition;
                     lr.SetPosition(0, pPos);
@@ -210,9 +153,6 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Șterge tot ce a fost generat anterior (noduri, linii etc.).
-    /// </summary>
     private void ClearMapVisuals()
     {
         Transform p = mapParent ? mapParent : transform;
@@ -224,15 +164,6 @@ public class MapGenerator : MonoBehaviour
         {
             DestroyImmediate(c.gameObject);
         }
-
         mapLevels.Clear();
-    }
-
-    /// <summary>
-    /// Accesezi nodurile, dacă ai nevoie de ele din alt script.
-    /// </summary>
-    public List<List<MapNode>> GetMapLevels()
-    {
-        return mapLevels;
     }
 }
