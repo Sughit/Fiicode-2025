@@ -35,9 +35,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float maxPitch = 80f;
 
     void Start()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;   
+    {   
         if (player == null || virtualCamera == null || planetCenter == null)
         {
             Debug.LogError("Setează player-ul, vcam-ul și planetCenter-ul în Inspector!");
