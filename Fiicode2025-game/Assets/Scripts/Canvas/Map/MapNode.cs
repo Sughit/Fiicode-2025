@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Cinemachine;
 
 public class MapNode : MonoBehaviour
 {
@@ -13,14 +14,20 @@ public class MapNode : MonoBehaviour
     public List<MapNode> parents = new List<MapNode>();
     public List<MapNode> children = new List<MapNode>();
     [SerializeField]private  Sprite[] imagine;
-
+    private CinemachineVirtualCamera vcam;
     // Nodul pe care jucătorul se află ACUM (în harta curentă)
-    public static MapNode currentNode;
+    public static MapNode currentNode = null;
 
     // Ultimul nod pe care s-a dat click (pentru a focaliza camera la întoarcere)
     public static MapNode lastNode;
+    private Vector3 transOriginal;
+    bool isChildOfCurrent, primul = false;
     void Start()
     {
+        transOriginal = new Vector3 (transform.localScale.x, transform.localScale.y, transform.localScale.z);
+        vcam = GameObject.Find("vcam").GetComponent<CinemachineVirtualCamera>();
+        vcam.LookAt = null;
+       //currentNode = GameObject.Find("Node_0_0").GetComponent<MapNode>();
         switch(nodeType)
         {
             case NodeType.Resources:
@@ -46,21 +53,26 @@ public class MapNode : MonoBehaviour
     }
     private void OnMouseEnter()
     {
-        transform.localScale = new Vector3(transform.localScale.x+0.3f, transform.localScale.y+0.3f, transform.localScale.z+0.3f);
+        if(this.gameObject.name == "Node_0_0")
+            transform.localScale = new Vector3(transform.localScale.x+0.3f, transform.localScale.y+0.3f, transform.localScale.z+0.3f);
+        else if(currentNode.children.Contains(this))
+            transform.localScale = new Vector3(transform.localScale.x+0.3f, transform.localScale.y+0.3f, transform.localScale.z+0.3f);
     }
     private void OnMouseExit()
     {
-        transform.localScale = new Vector3(transform.localScale.x-0.3f, transform.localScale.y-0.3f, transform.localScale.z-0.3f);
+        transform.localScale = transOriginal;
     }
 
     private void OnMouseDown()
     {
+
         // Dacă nu există un nod curent, înseamnă că e primul nod accesat
-        if (currentNode == null)
+        if (this.gameObject.name == "Node_0_0")
         {
+            primul = true;
             currentNode = this;
             lastNode = this;
-            CinemachineFocusManager.Instance.FocusOn(this.transform);
+            vcam.Follow = this.transform;
 
             LoadSceneForThisNode();
             return;
@@ -69,19 +81,19 @@ public class MapNode : MonoBehaviour
         // Dacă există deja un nod curent, putem alege fie pe el (același),
         // fie un copil al lui (mergem "în jos").
         bool isCurrentNode = (this == currentNode);
-        bool isChildOfCurrent = currentNode.children.Contains(this);
+        isChildOfCurrent = currentNode.children.Contains(this);
 
         if (isCurrentNode)
         {
             lastNode = this;
-            CinemachineFocusManager.Instance.FocusOn(this.transform);
+            vcam.Follow = this.transform;
             LoadSceneForThisNode();
         }
         else if (isChildOfCurrent)
         {
             currentNode = this;
             lastNode = this;
-            CinemachineFocusManager.Instance.FocusOn(this.transform);
+            vcam.Follow = this.transform;
             LoadSceneForThisNode();
         }
         else
@@ -96,16 +108,16 @@ public class MapNode : MonoBehaviour
         switch (nodeType)
         {
             case NodeType.Resources:
-                SceneManager.LoadScene("SceneResources"); 
+                //SceneManager.LoadScene("SceneResources"); 
                 break;
             case NodeType.Hostile:
-                SceneManager.LoadScene("SceneHostile");
+                //SceneManager.LoadScene("SceneHostile");
                 break;
             case NodeType.Market:
-                SceneManager.LoadScene("SceneMarket");
+               // SceneManager.LoadScene("SceneMarket");
                 break;
             case NodeType.Boss:
-                SceneManager.LoadScene("SceneBoss");
+                //SceneManager.LoadScene("SceneBoss");
                 break;
             default:
                 Debug.LogWarning("Tipul nodului nu are scenă asociată!");
