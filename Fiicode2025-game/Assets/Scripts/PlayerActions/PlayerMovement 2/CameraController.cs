@@ -28,6 +28,11 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {   
+        if(planetCenter == null)
+        {
+            planetCenter = GameObject.FindWithTag("Planet").transform;
+        }
+
         if (player == null || virtualCamera == null || planetCenter == null)
         {
             Debug.LogError("Setează player-ul, vcam-ul și planetCenter-ul în Inspector!");
