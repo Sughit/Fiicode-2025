@@ -115,20 +115,20 @@ public class MapNode : MonoBehaviour
         switch (nodeType)
         {
             case NodeType.Resources:
-                //SceneManager.LoadScene("SceneResources"); 
+                SceneManager.LoadScene("SceneResources"); 
                 break;
             case NodeType.Hostile:
-                //SceneManager.LoadScene("SceneHostile");
+                SceneManager.LoadScene("SceneHostile");
                 break;
             case NodeType.Market:
-                //SceneManager.LoadScene("SceneMarket");
+                SceneManager.LoadScene("SceneMarket");
                 break;
             case NodeType.Boss:
-                //SceneManager.LoadScene("SceneBoss");
+                SceneManager.LoadScene("SceneBoss");
                 break;
             case NodeType.Start:
                 player.enabled = true;
-                //SceneManager.LoadScene("FirstScene");
+                SceneManager.LoadScene("FirstScene");
                 break;
             default:
                 Debug.LogWarning("Tipul nodului nu are scenă asociată!");
