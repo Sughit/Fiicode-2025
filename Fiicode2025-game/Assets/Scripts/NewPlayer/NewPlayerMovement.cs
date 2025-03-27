@@ -21,6 +21,7 @@ public class NewPlayerMovement : MonoBehaviour
 
     // Variabile pentru mișcarea interpolată
     private bool isMoving = false;
+    private bool isApproaching = false; // Flag pentru a indica că se face o apropiere suplimentară
     private Vector3 startPosition;
     private Vector3 targetPoint;
     private Vector3 startDir;         // Direcția radială la momentul de start (de la centru către poziția jucătorului)
@@ -65,6 +66,10 @@ public class NewPlayerMovement : MonoBehaviour
         {
             MoveAlongSurface();
         }
+        else if (isApproaching)
+        {
+            ApproachTarget();
+        }
 
         ApplyGravityAndRotation();
         PreventPenetration();
@@ -84,6 +89,7 @@ public class NewPlayerMovement : MonoBehaviour
         moveDuration = arcLength / moveSpeed;
         moveTimer = 0f;
         isMoving = true;
+        isApproaching = false;
 
         // Calculăm direcția tangentă de plecare: proiectăm vectorul de la start către target pe planul tangent la start
         Vector3 rawDirection = targetPoint - startPosition;
@@ -106,15 +112,46 @@ public class NewPlayerMovement : MonoBehaviour
         // Rotim gfx spre direcția de plecare (constantă, calculată la momentul inițierii mișcării)
         if (gfx != null)
         {
-            // "Up" la noua poziție este direcția radială (newDir)
             Quaternion targetGfxRotation = Quaternion.LookRotation(departureDirection, newDir);
             gfx.rotation = Quaternion.Slerp(gfx.rotation, targetGfxRotation, Time.fixedDeltaTime * rotationSpeed);
         }
 
-        // Dacă am ajuns la destinație (sau aproape), oprim mișcarea
-        if (t >= 1f || Vector3.Distance(newPosition, targetPoint) < stoppingDistance)
+        // La finalul interpolării, verificăm dacă jucătorul nu este suficient de aproape de target
+        if (t >= 1f)
         {
+            float distToTarget = Vector3.Distance(newPosition, targetPoint);
+            // Dacă drumul a fost prea abrupt și distanța este mult mai mare decât distanța de oprire,
+            // inițiem o fază de apropiere suplimentară.
+            if (distToTarget > stoppingDistance * 1.5f)
+            {
+                isApproaching = true;
+            }
             isMoving = false;
+        }
+    }
+
+    // Apropiere suplimentară de punctul țintă dacă acesta necesită un drum prea abrupt
+    void ApproachTarget()
+    {
+        Vector3 currentPos = rb.position;
+        Vector3 direction = targetPoint - currentPos;
+        // Proiectăm direcția pe planul tangent la suprafață (folosind transform.up ca referință)
+        Vector3 tangentDir = Vector3.ProjectOnPlane(direction, transform.up);
+        float distance = tangentDir.magnitude;
+        if (distance < stoppingDistance)
+        {
+            isApproaching = false;
+            return;
+        }
+        Vector3 movement = tangentDir.normalized * moveSpeed * Time.fixedDeltaTime;
+        if (movement.magnitude > distance)
+            movement = tangentDir;
+        rb.MovePosition(currentPos + movement);
+
+        if (gfx != null && movement != Vector3.zero)
+        {
+            Quaternion targetGfxRotation = Quaternion.LookRotation(movement, transform.up);
+            gfx.rotation = Quaternion.Slerp(gfx.rotation, targetGfxRotation, Time.fixedDeltaTime * rotationSpeed);
         }
     }
 

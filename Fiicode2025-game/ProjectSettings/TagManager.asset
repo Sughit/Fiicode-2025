@@ -10,6 +10,7 @@ TagManager:
   - Ore
   - SolidResource
   - FluidResource
+  - Enemy
   layers:
   - Default
   - TransparentFX

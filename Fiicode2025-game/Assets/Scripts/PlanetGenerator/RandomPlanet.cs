@@ -8,6 +8,7 @@ public class RandomPlanet : Planet {
     [Header("Base Settings")]
     [Tooltip("ShapeSettings-ul sursă din care se va inspira această planetă. Acest asset nu se va modifica.")]
     public ShapeSettings baseShapeSettings;
+    public float planetRadius;
 
     // Setările specifice pentru randomizare
     public enum PlanetSize { Small, Medium, Large, Random }
@@ -66,6 +67,7 @@ public class RandomPlanet : Planet {
                 minRadius = 15f; maxRadius = 30f; break;
         }
         shapeSettings.planetRadius = Random.Range(minRadius, maxRadius);
+        planetRadius = shapeSettings.planetRadius;
 
         // Generare gradient de culori în funcție de tipul planetei
         Gradient gradient = new Gradient();
@@ -186,8 +188,8 @@ public class RandomPlanet : Planet {
                     if (layer.noiseSettings.filterType == NoiseSettings.FilterType.Simple && layer.noiseSettings.simpleNoiseSettings != null) {
                         var settings = layer.noiseSettings.simpleNoiseSettings;
                         settings.strength = Random.Range(settings.strength * 0.9f, settings.strength * 1.1f);
-                        settings.baseRoughness = Random.Range(settings.baseRoughness * 0.9f, settings.baseRoughness * 1.1f);
-                        settings.roughness = Random.Range(settings.roughness * 0.9f, settings.roughness * 1.1f);
+                        settings.baseRoughness = Random.Range(settings.baseRoughness * 0.9f, settings.baseRoughness * 1f);
+                        settings.roughness = Random.Range(settings.roughness * 0.9f, settings.roughness * 1f);
                         settings.persistence = Random.Range(settings.persistence * 0.9f, settings.persistence * 1.1f);
                         settings.minValue = Random.Range(settings.minValue * 0.9f, settings.minValue * 1.1f);
                         settings.centre += new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f));
@@ -198,8 +200,8 @@ public class RandomPlanet : Planet {
                     else if (layer.noiseSettings.filterType == NoiseSettings.FilterType.Ridgid && layer.noiseSettings.ridgidNoiseSettings != null) {
                         var settings = layer.noiseSettings.ridgidNoiseSettings;
                         settings.strength = Random.Range(settings.strength * 0.9f, settings.strength * 1.1f);
-                        settings.baseRoughness = Random.Range(settings.baseRoughness * 0.9f, settings.baseRoughness * 1.1f);
-                        settings.roughness = Random.Range(settings.roughness * 0.9f, settings.roughness * 1.1f);
+                        settings.baseRoughness = Random.Range(settings.baseRoughness * 0.9f, settings.baseRoughness * 1f);
+                        settings.roughness = Random.Range(settings.roughness * 0.9f, settings.roughness * 1f);
                         settings.persistence = Random.Range(settings.persistence * 0.9f, settings.persistence * 1.1f);
                         settings.minValue = Random.Range(settings.minValue * 0.9f, settings.minValue * 1.1f);
                         settings.centre += new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f));

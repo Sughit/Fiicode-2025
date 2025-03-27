@@ -18,6 +18,8 @@ public class PlayerMovementOnPlanet : MonoBehaviour
     // Salvăm direcția de mișcare aici, pentru rotația din LateUpdate
     private Vector3 latestMoveDirection;
 
+    private NewPlayerAttack playerAttack;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -25,6 +27,8 @@ public class PlayerMovementOnPlanet : MonoBehaviour
         // Asigură-te că, în Inspector, ai:
         // - Rb.interpolation = Interpolate
         // - Collision Detection = Continuous (dacă ai suprafețe neregulate)
+
+        playerAttack = GetComponent<NewPlayerAttack>();
     }
 
     void Start()
@@ -83,7 +87,7 @@ public class PlayerMovementOnPlanet : MonoBehaviour
     // În LateUpdate rotim doar partea vizuală (gfx) pentru animație / feedback
     void LateUpdate()
     {
-        if (latestMoveDirection != Vector3.zero)
+        if (latestMoveDirection != Vector3.zero && playerAttack.currentTarget == null)
         {
             Quaternion moveRotation = Quaternion.LookRotation(latestMoveDirection, transform.up);
             gfx.rotation = Quaternion.Slerp(gfx.rotation, moveRotation, Time.deltaTime * rotationSpeed);

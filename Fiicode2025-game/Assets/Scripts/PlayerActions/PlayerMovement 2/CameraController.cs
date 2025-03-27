@@ -22,17 +22,9 @@ public class CameraController : MonoBehaviour
 
     // Unghiul de rotație pentru camera, modificat de mouse.
     private float yawAngle = 0f; // Rotație pe axa orizontală (Yaw)
-    private float pitchAngle = 0f; // Rotație pe axa verticală (Pitch)
     [Tooltip("Viteză de rotație cu mouse-ul pe orizontală")]
     [SerializeField] private float rotationSpeed = 3f;
     [Tooltip("Viteză de rotație cu mouse-ul pe verticală")]
-    [SerializeField] private float verticalRotationSpeed = 2f;
-
-    [Header("Limite Rotație Verticală")]
-    [Tooltip("Limita minimă pentru rotația pe axa Y (în grade)")]
-    [SerializeField] private float minPitch = -40f;
-    [Tooltip("Limita maximă pentru rotația pe axa Y (în grade)")]
-    [SerializeField] private float maxPitch = 80f;
 
     void Start()
     {   
@@ -48,6 +40,9 @@ public class CameraController : MonoBehaviour
         // Setăm câmpurile Follow și LookAt ale Cinemachine Virtual Camera
         virtualCamera.Follow = cameraFollowTarget;
         virtualCamera.LookAt = player;
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
 
@@ -77,19 +72,13 @@ public class CameraController : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X");
         yawAngle += mouseX * rotationSpeed;
 
-        // 5) Citim mouseY și actualizăm pitch-ul (rotirea pe verticală) cu limite
-        float mouseY = Input.GetAxis("Mouse Y");
-        pitchAngle += mouseY * verticalRotationSpeed;  // scădem pentru a obține o mișcare corectă (mărește unghiul când miști în sus)
-        pitchAngle = Mathf.Clamp(pitchAngle, minPitch, maxPitch); // Aplicăm limitele
-
-        // 6) Calculăm rotația finală pe orizontală și verticală
+        // 5) Calculăm rotația finală pe orizontală și verticală
         Quaternion yawRotation = Quaternion.AngleAxis(yawAngle, planetUp); // Rotire pe axa orizontală
-        Quaternion pitchRotation = Quaternion.AngleAxis(pitchAngle, transform.right); // Rotire pe axa verticală
 
-        // 7) Calculăm forward-ul final rotit
-        Vector3 finalForward = yawRotation * pitchRotation * correctedForward;
+        // 6) Calculăm forward-ul final rotit
+        Vector3 finalForward = yawRotation * correctedForward;
 
-        // 8) Construim desiredRotation și îl aplicăm cu un Slerp pentru a face tranzițiile mai line
+        // 7) Construim desiredRotation și îl aplicăm cu un Slerp pentru a face tranzițiile mai line
         Quaternion desiredRotation = Quaternion.LookRotation(finalForward, planetUp);
         cameraFollowTarget.rotation = Quaternion.Slerp(
             cameraFollowTarget.rotation,
