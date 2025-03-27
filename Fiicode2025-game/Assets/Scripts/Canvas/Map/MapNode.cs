@@ -2,10 +2,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Cinemachine;
+using UnityEngine.UI;
 
 public class MapNode : MonoBehaviour
 {
-    public enum NodeType { Resources, Hostile, Market, Boss }
+    public enum NodeType { Resources, Hostile, Market, Boss, Start }
 
     [Header("Tipul nodului")]
     public NodeType nodeType;
@@ -22,12 +23,14 @@ public class MapNode : MonoBehaviour
     public static MapNode lastNode;
     private Vector3 transOriginal;
     bool isChildOfCurrent, primul = false;
+    private Image player;
     void Start()
     {
         transOriginal = new Vector3 (transform.localScale.x, transform.localScale.y, transform.localScale.z);
         vcam = GameObject.Find("vcam").GetComponent<CinemachineVirtualCamera>();
         vcam.LookAt = null;
-       //currentNode = GameObject.Find("Node_0_0").GetComponent<MapNode>();
+        player = GameObject.Find("Canvas/Image").GetComponent<Image>();
+        player.enabled = false;
         switch(nodeType)
         {
             case NodeType.Resources:
@@ -44,6 +47,10 @@ public class MapNode : MonoBehaviour
 
             case NodeType.Boss:
             GetComponent<SpriteRenderer>().sprite = imagine[3];
+            break;
+
+            case NodeType.Start:
+            GetComponent<SpriteRenderer>().sprite = imagine[4];
             break;
 
             default:
@@ -74,7 +81,7 @@ public class MapNode : MonoBehaviour
             lastNode = this;
             vcam.Follow = this.transform;
 
-            LoadSceneForThisNode();
+            Invoke("LoadSceneForThisNode", 1f);
             return;
         }
 
@@ -87,14 +94,14 @@ public class MapNode : MonoBehaviour
         {
             lastNode = this;
             vcam.Follow = this.transform;
-            LoadSceneForThisNode();
+            Invoke("LoadSceneForThisNode", 1f);
         }
         else if (isChildOfCurrent)
         {
             currentNode = this;
             lastNode = this;
             vcam.Follow = this.transform;
-            LoadSceneForThisNode();
+            Invoke("LoadSceneForThisNode", 1f);
         }
         else
         {
@@ -108,16 +115,20 @@ public class MapNode : MonoBehaviour
         switch (nodeType)
         {
             case NodeType.Resources:
-                //SceneManager.LoadScene("SceneResources"); 
+                SceneManager.LoadScene("SceneResources"); 
                 break;
             case NodeType.Hostile:
-                //SceneManager.LoadScene("SceneHostile");
+                SceneManager.LoadScene("SceneHostile");
                 break;
             case NodeType.Market:
-               // SceneManager.LoadScene("SceneMarket");
+                SceneManager.LoadScene("SceneMarket");
                 break;
             case NodeType.Boss:
-                //SceneManager.LoadScene("SceneBoss");
+                SceneManager.LoadScene("SceneBoss");
+                break;
+            case NodeType.Start:
+                player.enabled = true;
+                SceneManager.LoadScene("FirstScene");
                 break;
             default:
                 Debug.LogWarning("Tipul nodului nu are scenă asociată!");

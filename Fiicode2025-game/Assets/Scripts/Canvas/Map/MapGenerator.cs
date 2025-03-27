@@ -57,7 +57,7 @@ public class MapGenerator : MonoBehaviour
                 }
 
                 go.name = $"Node_{lvl}_{n}";
-                nodeComp.nodeType = (lvl == 0) ? MapNode.NodeType.Resources : DetermineNodeType(lvl, nodeComp);
+                nodeComp.nodeType = (lvl == 0) ? MapNode.NodeType.Start : DetermineNodeType(lvl, nodeComp);
                 levelNodes.Add(nodeComp);
             }
 
