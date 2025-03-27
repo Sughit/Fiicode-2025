@@ -37,6 +37,8 @@ public class PlayerMovementOnPlanet : MonoBehaviour
         {
             PlayerController.instance.OnMove += HandleMoveInput;
         }
+
+        if(planet == null) planet = GameObject.FindWithTag("Planet").transform;
     }
 
     void HandleMoveInput(Vector2 input)

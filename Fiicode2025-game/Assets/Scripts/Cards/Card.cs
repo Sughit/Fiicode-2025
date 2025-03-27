@@ -15,6 +15,9 @@ public class Card : ScriptableObject
     public float attackSpeed;
     public float attackRange;
 
-    [Header("Special")]
+    [Header("Description")]
     public string cardName;
+    public string cardDescription;
+    public Sprite cardImage;
+    public PriceType priceType;
 }
