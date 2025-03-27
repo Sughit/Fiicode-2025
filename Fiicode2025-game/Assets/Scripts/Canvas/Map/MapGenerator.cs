@@ -25,15 +25,19 @@ public class MapGenerator : MonoBehaviour
 
     private List<List<MapNode>> mapLevels = new List<List<MapNode>>();
     private Dictionary<MapNode, int> marketCooldown = new Dictionary<MapNode, int>();
+    
+    private int lastMarketLevel = -3;
+    private int marketCount = 0;
 
     public void GenerateMap()
     {
         ClearMapVisuals();
         mapLevels.Clear();
+        marketCount = 0;
         
         for (int lvl = 0; lvl < totalLevels; lvl++)
         {
-            int numNodesInLevel = (lvl == totalLevels - 1) ? 1 : Random.Range(minNodesPerLevel, maxNodesPerLevel + 1);
+            int numNodesInLevel = (lvl == 0) ? 1 : (lvl == totalLevels - 1) ? 1 : Random.Range(minNodesPerLevel, maxNodesPerLevel + 1);
             List<MapNode> levelNodes = new List<MapNode>();
 
             for (int n = 0; n < numNodesInLevel; n++)
@@ -53,7 +57,7 @@ public class MapGenerator : MonoBehaviour
                 }
 
                 go.name = $"Node_{lvl}_{n}";
-                nodeComp.nodeType = DetermineNodeType(lvl, nodeComp); // Corectare aici
+                nodeComp.nodeType = (lvl == 0) ? MapNode.NodeType.Resources : DetermineNodeType(lvl, nodeComp);
                 levelNodes.Add(nodeComp);
             }
 
@@ -61,23 +65,42 @@ public class MapGenerator : MonoBehaviour
             if (lvl > 0) ConnectLevels(mapLevels[lvl - 1], levelNodes);
         }
 
+        EnsureMinimumMarkets(3);
         IntroduceMultipleParents();
         CreateLines();
-        Debug.Log($"Map generated with {totalLevels} levels.");
+        Debug.Log($"Map generated with {totalLevels} levels and {marketCount} market nodes.");
     }
 
-    private MapNode.NodeType DetermineNodeType(int level, MapNode node) // Modificat aici pentru a utiliza MapNode.NodeType
+    private MapNode.NodeType DetermineNodeType(int level, MapNode node)
     {
-        if (level == 0) return MapNode.NodeType.Resources; // Corectare aici
-        if (level == totalLevels - 1) return MapNode.NodeType.Boss; // Corectare aici
+        if (level == totalLevels - 1) return MapNode.NodeType.Boss;
         
         float rand = Random.value;
-        if (rand < 0.4f) return MapNode.NodeType.Hostile; // Corectare aici
-        if (rand < 0.75f) return MapNode.NodeType.Resources; // Corectare aici
+        if (rand < 0.4f) return MapNode.NodeType.Hostile;
+        if (rand < 0.75f) return MapNode.NodeType.Resources;
+        
+        if (level - lastMarketLevel < 3 || marketCount >= 2) return MapNode.NodeType.Hostile;
+        lastMarketLevel = level;
+        marketCount++;
+        return MapNode.NodeType.Market;
+    }
 
-        if (marketCooldown.ContainsKey(node)) return MapNode.NodeType.Hostile; // Corectare aici
-        marketCooldown[node] = 3;
-        return MapNode.NodeType.Market; // Corectare aici
+    private void EnsureMinimumMarkets(int minMarkets)
+    {
+        while (marketCount < minMarkets)
+        {
+            int randomLevel = Random.Range(1, totalLevels - 1);
+            List<MapNode> levelNodes = mapLevels[randomLevel];
+            if (levelNodes.Count > 0)
+            {
+                int randomIndex = Random.Range(0, levelNodes.Count);
+                if (levelNodes[randomIndex].nodeType != MapNode.NodeType.Market)
+                {
+                    levelNodes[randomIndex].nodeType = MapNode.NodeType.Market;
+                    marketCount++;
+                }
+            }
+        }
     }
 
     private void ConnectLevels(List<MapNode> previousLevel, List<MapNode> currentLevel)
