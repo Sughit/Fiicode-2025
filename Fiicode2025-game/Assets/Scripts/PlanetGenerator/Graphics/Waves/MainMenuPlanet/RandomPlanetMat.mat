@@ -34,7 +34,11 @@ Material:
     - _FoamThreshold: 0.05
     - _MaxHeight: 1
     - _MinHeight: 0
+<<<<<<< Updated upstream
     - _PlanetRadius: 19.566275
+=======
+    - _PlanetRadius: 21.717438
+>>>>>>> Stashed changes
     - _WaterHeight: 0
     - _WaveScale: 2
     - _WaveSpeed: 1

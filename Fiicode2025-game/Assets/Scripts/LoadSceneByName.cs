@@ -7,7 +7,7 @@ public class LoadSceneByName : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
+        if(Input.GetKeyDown(KeyCode.Tab))
         {
             SceneManager.LoadScene(sceneName);
         }

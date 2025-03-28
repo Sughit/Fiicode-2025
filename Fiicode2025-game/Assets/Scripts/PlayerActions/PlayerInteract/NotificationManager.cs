@@ -63,7 +63,7 @@ public class NotificationManager : MonoBehaviour
     /// </summary>
     private IEnumerator NotificationRoutine(string message)
     {
-        AudioManager.instance.PlaySound("notification");
+        if(AudioManager.instance != null) AudioManager.instance.PlaySound("notification");
         // Setăm mesajul și afișăm textul
         if (notificationText != null)
         {
