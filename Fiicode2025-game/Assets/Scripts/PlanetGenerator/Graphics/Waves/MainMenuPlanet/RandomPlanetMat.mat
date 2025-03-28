@@ -29,21 +29,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _FoamSpacing: 1
     - _FoamStrength: 0.5
     - _FoamThreshold: 0.05
     - _MaxHeight: 1
     - _MinHeight: 0
-<<<<<<< Updated upstream
-    - _PlanetRadius: 19.566275
-=======
-    - _PlanetRadius: 21.717438
->>>>>>> Stashed changes
+    - _PlanetRadius: 37
     - _WaterHeight: 0
     - _WaveScale: 2
     - _WaveSpeed: 1
     - _WaveStrength: 0.05
     m_Colors:
-    - _FoamColor: {r: 0.014247027, g: 0.15956175, b: 0.3283019, a: 0.45490196}
+    - _FoamColor: {r: 0.020185072, g: 0.03293905, b: 0.3056603, a: 0.26666617}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
