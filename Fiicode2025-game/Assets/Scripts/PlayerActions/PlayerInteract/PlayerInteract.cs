@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public class PlayerInteract : MonoBehaviour
 {
+    //inainte de schimbari
     private Collider[] interactablesBuffer = new Collider[5];
     private HashSet<Interactable> previousInteractables = new HashSet<Interactable>();
     private HashSet<Interactable> currentInteractables = new HashSet<Interactable>();

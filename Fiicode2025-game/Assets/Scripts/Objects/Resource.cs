@@ -4,6 +4,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public class ResourceDrop
 {
+    //inainte de schimbari
     [Tooltip("Numele item-ului (trebuie să existe în Inventory).")]
     public string itemName;
 

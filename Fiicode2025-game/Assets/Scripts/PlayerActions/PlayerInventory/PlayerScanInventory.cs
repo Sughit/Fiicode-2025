@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class PlayerScanInventory : MonoBehaviour
 {
+    //inainte de schimbari
     public static PlayerScanInventory instance;
     public ScanInventory inventory;
 
