@@ -11,6 +11,7 @@ TagManager:
   - SolidResource
   - FluidResource
   - Enemy
+  - GameManager
   layers:
   - Default
   - TransparentFX
