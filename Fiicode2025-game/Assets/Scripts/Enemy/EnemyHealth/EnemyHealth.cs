@@ -21,7 +21,9 @@ public class EnemyHealth : Health
 
     public override void Die()
     {
-        GameObject.FindWithTag("GameManager").GetComponent<GameManagerHostile>().EnemyKilled();
+        GameObject manager = GameObject.FindWithTag("GameManager");
+        if(manager != null)
+            manager.GetComponent<GameManagerHostile>().EnemyKilled();
         base.Die();
         Debug.Log("Enemy died!");
     }
